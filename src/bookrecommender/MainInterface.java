@@ -69,6 +69,10 @@ public class MainInterface {
             registerForm.setVisible(true);
         });
 
+        btnExit.addActionListener(e -> {
+            exitApplication();
+        });
+
         frame.setVisible(true);
     }
 
@@ -82,5 +86,10 @@ public class MainInterface {
 
     interface LoginListener {
         void onLogin(String username);
+    }
+
+    private static void exitApplication() {
+        frame.dispose(); // Chiude il frame
+        System.exit(0); // Termina l'applicazione
     }
 }

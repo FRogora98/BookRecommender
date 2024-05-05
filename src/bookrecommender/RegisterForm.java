@@ -10,6 +10,8 @@ public class RegisterForm extends JFrame {
     private JTextField lastNameField;
     private JTextField birthYearField;
     private JTextField fiscalCodeField;
+    private JTextField usernameField;
+    private JTextField passField;
 
     public RegisterForm() {
         super("Registrazione");
@@ -17,7 +19,7 @@ public class RegisterForm extends JFrame {
         setSize(300, 200);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(5, 2));
+        JPanel panel = new JPanel(new GridLayout(7, 2));
 
         panel.add(new JLabel("Nome:"));
         firstNameField = new JTextField();
@@ -35,17 +37,27 @@ public class RegisterForm extends JFrame {
         fiscalCodeField = new JTextField();
         panel.add(fiscalCodeField);
 
+        panel.add(new JLabel("Nome utente:"));
+        usernameField = new JTextField();
+        panel.add(usernameField);
+
+        panel.add(new JLabel("Password:"));
+        passField = new JTextField();
+        panel.add(passField);
+
         JButton registerButton = new JButton("Registra");
         registerButton.addActionListener(e -> {
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
             String birthYear = birthYearField.getText();
             String fiscalCode = fiscalCodeField.getText();
+            String username = usernameField.getText();
+            String password = passField.getText();
 
-            if (firstName.isEmpty() || lastName.isEmpty() || birthYear.isEmpty() || fiscalCode.isEmpty()) {
+            if (firstName.isEmpty() || lastName.isEmpty() || birthYear.isEmpty() || fiscalCode.isEmpty() || username.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Completa tutti i campi.");
             } else {
-                registerUser(firstName, lastName, birthYear, fiscalCode);
+                registerUser(firstName, lastName, birthYear, fiscalCode, username, password);
             }
         });
         panel.add(registerButton);
@@ -54,10 +66,10 @@ public class RegisterForm extends JFrame {
         setVisible(true);
     }
 
-    private void registerUser(String firstName, String lastName, String username, String fiscalCode) {
+    private void registerUser(String firstName, String lastName, String birthYear, String fiscalCode, String username, String password) {
         try {
             FileWriter writer = new FileWriter("./data/UtentiRegistrati.csv", true);
-            writer.append(firstName + "," + lastName + "," + username + "," + fiscalCode + "\n");
+            writer.append(firstName + "," + lastName + "," + birthYear + "," + fiscalCode + "," + username + "," + password + "\n");
             writer.close();
             JOptionPane.showMessageDialog(null, "Utente registrato con successo.");
             dispose();

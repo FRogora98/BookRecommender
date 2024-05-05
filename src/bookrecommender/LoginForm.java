@@ -54,7 +54,7 @@ public class LoginForm extends JFrame {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length >= 4 && parts[2].equals(username) && parts[3].equals(password)) {
+                if (parts.length >= 5 && parts[4].equals(username) && parts[5].equals(password)) {
                     return true;
                 }
             }
