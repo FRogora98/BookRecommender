@@ -13,6 +13,7 @@ public class MainInterface {
     private static JButton btnLogout = new JButton("Logout");
     private static JButton btnAddBook = new JButton("Aggiungi libro");
     private static JButton btnReview = new JButton("Scrivi recensione");
+    private static JButton btnRegister = new JButton("Registrati");
 
     public static void main(String[] args) {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -20,12 +21,10 @@ public class MainInterface {
         frame.setLocationRelativeTo(null);
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnRegister = new JButton("Registrati");
-
         topPanel.add(btnLogin);
         topPanel.add(btnLogout);
         topPanel.add(btnRegister);
-        btnLogout.setVisible(false); // Inizialmente il bottone logout non è visibile
+        btnLogout.setVisible(false); // Initially the logout button is not visible
 
         JPanel centerPanel = new JPanel(new FlowLayout());
         JTextField searchField = new JTextField(20);
@@ -58,6 +57,7 @@ public class MainInterface {
                 isLoggedIn = true;
                 updateInterfaceForLoggedInUser();
             });
+            loginForm.setVisible(true);
         });
 
         btnLogout.addActionListener(e -> {
@@ -66,7 +66,10 @@ public class MainInterface {
             updateInterfaceForLoggedInUser();
         });
 
-        btnRegister.addActionListener(e -> new LoginForm());
+        btnRegister.addActionListener(e -> {
+            RegisterForm registerForm = new RegisterForm();
+            registerForm.setVisible(true);
+        });
 
         frame.setVisible(true);
     }
@@ -74,6 +77,7 @@ public class MainInterface {
     private static void updateInterfaceForLoggedInUser() {
         btnLogin.setVisible(!isLoggedIn);
         btnLogout.setVisible(isLoggedIn);
+        btnRegister.setVisible(!isLoggedIn); // Show register button only when not logged in
         btnAddBook.setVisible(isLoggedIn);
         btnReview.setVisible(isLoggedIn);
     }
