@@ -2,8 +2,6 @@ package bookrecommender;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MainInterface {
     private static JFrame frame = new JFrame("Book Recommender System");
