@@ -6,76 +6,79 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainInterface {
-    private static JLabel lblUsername;
+    private static JFrame frame = new JFrame("Book Recommender System");
+    private static JLabel lblUsername = new JLabel("Benvenuto, Utente", JLabel.CENTER);
+    private static boolean isLoggedIn = false;
+    private static JButton btnLogin = new JButton("Login");
+    private static JButton btnLogout = new JButton("Logout");
+    private static JButton btnAddBook = new JButton("Aggiungi libro");
+    private static JButton btnReview = new JButton("Scrivi recensione");
 
     public static void main(String[] args) {
-        // Crea il frame principale
-        JFrame frame = new JFrame("Book Recommender System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400); // Dimensioni più grandi
-        frame.setLocationRelativeTo(null); // Centra la finestra
+        frame.setSize(600, 400);
+        frame.setLocationRelativeTo(null);
 
-        // Pannello con layout manager di tipo BorderLayout
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnRegister = new JButton("Registrati");
 
-        // Pannello per i pulsanti in alto
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // Pulsanti allineati a destra
-
-        // Aggiungi i pulsanti
-        JButton btnRegister = new JButton("Registra nuovo utente");
-        JButton btnLogin = new JButton("Login");
-
-        // Aggiungi i pulsanti al pannello in alto
         topPanel.add(btnLogin);
+        topPanel.add(btnLogout);
         topPanel.add(btnRegister);
+        btnLogout.setVisible(false); // Inizialmente il bottone logout non è visibile
 
-        // Aggiungi il pannello in alto al pannello principale
-        panel.add(topPanel, BorderLayout.NORTH);
-
-        // Pannello per la barra di ricerca al centro
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new FlowLayout());
-
-        // Aggiungi la barra di ricerca
-        JTextField searchField = new JTextField(20); // Barra di ricerca con larghezza fissa
+        JPanel centerPanel = new JPanel(new FlowLayout());
+        JTextField searchField = new JTextField(20);
+        JButton searchButton = new JButton("Cerca");
         centerPanel.add(searchField);
+        centerPanel.add(searchButton);
 
-        // Aggiungi il pannello al centro al pannello principale
-        panel.add(centerPanel, BorderLayout.CENTER);
+        JPanel bottomPanel = new JPanel(new GridLayout(1, 5));
+        bottomPanel.add(btnAddBook);
+        bottomPanel.add(btnReview);
+        JButton btnShowBooks = new JButton("Mostra tutti i libri");
+        JButton btnExit = new JButton("Esci");
+        bottomPanel.add(btnShowBooks);
+        bottomPanel.add(btnExit);
 
-        // Etichetta per il nome utente
-        lblUsername = new JLabel("Benvenuto, Utente");
-        lblUsername.setVisible(false); // Inizialmente non visibile
-        panel.add(lblUsername, BorderLayout.WEST); // Aggiungi a sinistra
+        btnAddBook.setVisible(false);
+        btnReview.setVisible(false);
 
-        // Definisci le azioni per i pulsanti
-        btnLogin.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Apri il LoginForm
-                LoginForm loginForm = new LoginForm();
-                loginForm.addLoginListener(new LoginListener() {
-                    @Override
-                    public void onLogin(String username) {
-                        lblUsername.setText("Benvenuto, " + username);
-                        lblUsername.setVisible(true); // Mostra il nome utente
-                    }
-                });
-            }
+        frame.setLayout(new BorderLayout());
+        frame.add(topPanel, BorderLayout.NORTH);
+        frame.add(centerPanel, BorderLayout.CENTER);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
+        frame.add(lblUsername, BorderLayout.WEST);
+
+        btnLogin.addActionListener(e -> {
+            LoginForm loginForm = new LoginForm();
+            loginForm.setLoginListener(username -> {
+                lblUsername.setText("Benvenuto, " + username);
+                lblUsername.setVisible(true);
+                isLoggedIn = true;
+                updateInterfaceForLoggedInUser();
+            });
         });
 
-        btnRegister.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Apri il LoginForm per la registrazione
-                new LoginForm();
-            }
+        btnLogout.addActionListener(e -> {
+            isLoggedIn = false;
+            lblUsername.setVisible(false);
+            updateInterfaceForLoggedInUser();
         });
 
-        // Aggiungi il pannello principale al frame
-        frame.getContentPane().add(panel);
+        btnRegister.addActionListener(e -> new LoginForm());
 
-        // Rendi visibile il frame
         frame.setVisible(true);
+    }
+
+    private static void updateInterfaceForLoggedInUser() {
+        btnLogin.setVisible(!isLoggedIn);
+        btnLogout.setVisible(isLoggedIn);
+        btnAddBook.setVisible(isLoggedIn);
+        btnReview.setVisible(isLoggedIn);
+    }
+
+    interface LoginListener {
+        void onLogin(String username);
     }
 }
