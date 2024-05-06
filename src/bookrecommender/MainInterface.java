@@ -2,6 +2,11 @@ package bookrecommender;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainInterface {
     private static JFrame frame = new JFrame("Book Recommender System");
@@ -12,7 +17,7 @@ public class MainInterface {
     private static JButton btnAddBook = new JButton("Aggiungi libro");
     private static JButton btnReview = new JButton("Scrivi recensione");
     private static JButton btnRegister = new JButton("Registrati");
-    private static JButton btnSearchBooks = new JButton("Cerca Libri");
+    private static JTextField searchField = new JTextField(20);
 
     public static void main(String[] args) {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,11 +28,9 @@ public class MainInterface {
         topPanel.add(btnLogin);
         topPanel.add(btnLogout);
         topPanel.add(btnRegister);
-        topPanel.add(btnSearchBooks);
         btnLogout.setVisible(false); // Initially the logout button is not visible
 
         JPanel centerPanel = new JPanel(new FlowLayout());
-        JTextField searchField = new JTextField(20);
         JButton searchButton = new JButton("Cerca");
         centerPanel.add(searchField);
         centerPanel.add(searchButton);
@@ -75,9 +78,11 @@ public class MainInterface {
             exitApplication();
         });
 
-        btnSearchBooks.addActionListener(e -> {
-            SearchBookForm searchBookForm = new SearchBookForm();
-            searchBookForm.setVisible(true);
+        // Aggiungi un listener per l'evento di pressione del tasto "Cerca" nel campo di ricerca
+        searchButton.addActionListener(e -> {
+            String searchTerm = searchField.getText();
+            List<Book> searchResults = searchBooks(searchTerm);
+            displaySearchResults(searchResults);
         });
 
         frame.setVisible(true);
@@ -94,5 +99,60 @@ public class MainInterface {
     private static void exitApplication() {
         frame.dispose(); // Chiude il frame
         System.exit(0); // Termina l'applicazione
+    }
+
+    private static List<Book> searchBooks(String searchTerm) {
+        List<Book> results = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("./BooksDatasetClean.csv"))) {
+            String line;
+            br.readLine(); // Salta la riga dell'intestazione
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                String title = parts[0];
+                String[] authors = parts[1].split("\\|");
+                String description = parts[2];
+                String category = parts[3];
+                String publisher = parts[4];
+                String price = parts[5];
+                String publishMonth = parts[6];
+                String publishYear = parts[7];
+                Book book = new Book(title, authors, description, category, publisher, price, publishMonth, publishYear);
+                // Esegui la logica per la ricerca basata su searchTerm
+                if (title.contains(searchTerm) || containsIgnoreCase(authors, searchTerm) || category.contains(searchTerm)) {
+                    results.add(book);
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Errore durante la ricerca dei libri.");
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+    private static boolean containsIgnoreCase(String[] array, String searchTerm) {
+        for (String str : array) {
+            if (str.trim().equalsIgnoreCase(searchTerm)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void displaySearchResults(List<Book> searchResults) {
+        JFrame searchResultsFrame = new JFrame("Risultati della ricerca");
+        JPanel resultsPanel = new JPanel(new GridLayout(searchResults.size(), 1));
+        for (Book book : searchResults) {
+            JLabel titleLabel = new JLabel("Titolo: " + book.getTitle());
+            JLabel authorsLabel = new JLabel("Autori: " + String.join(", ", book.getAuthors()));
+            JLabel categoryLabel = new JLabel("Categoria: " + book.getCategory());
+            // Aggiungi altre informazioni del libro se necessario
+            resultsPanel.add(titleLabel);
+            resultsPanel.add(authorsLabel);
+            resultsPanel.add(categoryLabel);
+        }
+        searchResultsFrame.getContentPane().add(resultsPanel);
+        searchResultsFrame.pack();
+        searchResultsFrame.setLocationRelativeTo(null);
+        searchResultsFrame.setVisible(true);
     }
 }
