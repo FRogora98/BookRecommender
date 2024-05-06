@@ -8,7 +8,7 @@ import java.io.IOException;
 public class RegisterForm extends JFrame {
     private JTextField firstNameField;
     private JTextField lastNameField;
-    private JTextField birthYearField;
+    private JTextField mailField;
     private JTextField fiscalCodeField;
     private JTextField usernameField;
     private JTextField passField;
@@ -29,13 +29,13 @@ public class RegisterForm extends JFrame {
         lastNameField = new JTextField();
         panel.add(lastNameField);
 
-        panel.add(new JLabel("Anno di nascita:"));
-        birthYearField = new JTextField();
-        panel.add(birthYearField);
-
         panel.add(new JLabel("Codice fiscale:"));
         fiscalCodeField = new JTextField();
         panel.add(fiscalCodeField);
+        
+        panel.add(new JLabel("Indirizzo mail:"));
+        mailField = new JTextField();
+        panel.add(mailField);
 
         panel.add(new JLabel("Nome utente:"));
         usernameField = new JTextField();
@@ -49,15 +49,15 @@ public class RegisterForm extends JFrame {
         registerButton.addActionListener(e -> {
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
-            String birthYear = birthYearField.getText();
+            String mail = mailField.getText();
             String fiscalCode = fiscalCodeField.getText();
             String username = usernameField.getText();
             String password = passField.getText();
 
-            if (firstName.isEmpty() || lastName.isEmpty() || birthYear.isEmpty() || fiscalCode.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            if (firstName.isEmpty() || lastName.isEmpty() || mail.isEmpty() || fiscalCode.isEmpty() || username.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Completa tutti i campi.");
             } else {
-                registerUser(firstName, lastName, birthYear, fiscalCode, username, password);
+                registerUser(firstName, lastName, mail, fiscalCode, username, password);
             }
         });
         panel.add(registerButton);
@@ -66,10 +66,10 @@ public class RegisterForm extends JFrame {
         setVisible(true);
     }
 
-    private void registerUser(String firstName, String lastName, String birthYear, String fiscalCode, String username, String password) {
+    private void registerUser(String firstName, String lastName, String mail, String fiscalCode, String username, String password) {
         try {
             FileWriter writer = new FileWriter("./data/UtentiRegistrati.csv", true);
-            writer.append(firstName + "," + lastName + "," + birthYear + "," + fiscalCode + "," + username + "," + password + "\n");
+            writer.append(firstName + "," + lastName + "," + mail + "," + fiscalCode + "," + username + "," + password + "\n");
             writer.close();
             JOptionPane.showMessageDialog(null, "Utente registrato con successo.");
             dispose();

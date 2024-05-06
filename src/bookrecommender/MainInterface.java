@@ -3,6 +3,8 @@ package bookrecommender;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -116,16 +118,16 @@ public class MainInterface {
             String line;
             br.readLine(); // Salta la riga dell'intestazione
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1); // Divide la stringa ignorando le virgole tra virgolette
+                String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1); 
                 if (parts.length >= 8) {
-                    String title = parts[0].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
-                    String authors = parts[1].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
-                    String description = parts[2].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
-                    String category = parts[3].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
-                    String publisher = parts[4].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
-                    String price = parts[5].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
-                    String publishMonth = parts[6].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
-                    String publishYear = parts[7].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+                    String title = parts[0].replaceAll("^\"|\"$", ""); 
+                    String authors = parts[1].replaceAll("^\"|\"$", ""); 
+                    String description = parts[2].replaceAll("^\"|\"$", "");
+                    String category = parts[3].replaceAll("^\"|\"$", "");
+                    String publisher = parts[4].replaceAll("^\"|\"$", "");
+                    String price = parts[5].replaceAll("^\"|\"$", "");
+                    String publishMonth = parts[6].replaceAll("^\"|\"$", "");
+                    String publishYear = parts[7].replaceAll("^\"|\"$", "");
 
                     Book book = new Book(title, authors, description, category, publisher, price, publishMonth, publishYear);
                     allBooks.add(book);
@@ -204,9 +206,25 @@ public class MainInterface {
         table.setFillsViewportHeight(true); // Riempie l'altezza della finestra con la tabella
         JScrollPane scrollPane = new JScrollPane(table);
     
+        // Aggiungi un listener di mouse per la tabella dei risultati della ricerca
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    Book selectedBook = searchResults.get(row);
+                    openBookForm(selectedBook);
+                }
+            }
+        });
+
         // Aggiungi il pannello dei risultati alla finestra dei risultati
         searchResultsFrame.getContentPane().add(scrollPane);
         searchResultsFrame.setLocationRelativeTo(null);
         searchResultsFrame.setVisible(true);
+    }
+
+    private static void openBookForm(Book book) {
+        BookForm bookForm = new BookForm(book);
     }
 }
