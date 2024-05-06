@@ -1,6 +1,7 @@
 package bookrecommender;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,10 +19,14 @@ public class MainInterface {
     private static JButton btnReview = new JButton("Scrivi recensione");
     private static JButton btnRegister = new JButton("Registrati");
     private static JTextField searchField = new JTextField(20);
+    private static List<Book> allBooks = new ArrayList<>(); // Lista di tutti i libri caricati una sola volta
 
     public static void main(String[] args) {
+        // Carica tutti i libri all'avvio dell'applicazione
+        loadBooks();
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -31,9 +36,13 @@ public class MainInterface {
         btnLogout.setVisible(false); // Initially the logout button is not visible
 
         JPanel centerPanel = new JPanel(new FlowLayout());
-        JButton searchButton = new JButton("Cerca");
+        JButton searchByTitleButton = new JButton("Cerca per Titolo");
+        JButton searchByAuthorButton = new JButton("Cerca per Autore");
+        JButton searchByYearButton = new JButton("Cerca per Anno di Uscita");
         centerPanel.add(searchField);
-        centerPanel.add(searchButton);
+        centerPanel.add(searchByTitleButton);
+        centerPanel.add(searchByAuthorButton);
+        centerPanel.add(searchByYearButton);
 
         JPanel bottomPanel = new JPanel(new GridLayout(1, 5));
         bottomPanel.add(btnAddBook);
@@ -78,14 +87,54 @@ public class MainInterface {
             exitApplication();
         });
 
-        // Aggiungi un listener per l'evento di pressione del tasto "Cerca" nel campo di ricerca
-        searchButton.addActionListener(e -> {
+        // Aggiungi un listener per l'evento di pressione del tasto "Cerca per Titolo"
+        searchByTitleButton.addActionListener(e -> {
             String searchTerm = searchField.getText();
-            List<Book> searchResults = searchBooks(searchTerm);
+            List<Book> searchResults = searchBooksByTitle(searchTerm);
+            displaySearchResults(searchResults);
+        });
+
+        // Aggiungi un listener per l'evento di pressione del tasto "Cerca per Autore"
+        searchByAuthorButton.addActionListener(e -> {
+            String searchTerm = searchField.getText();
+            List<Book> searchResults = searchBooksByAuthor(searchTerm);
+            displaySearchResults(searchResults);
+        });
+
+        // Aggiungi un listener per l'evento di pressione del tasto "Cerca per Anno di Uscita"
+        searchByYearButton.addActionListener(e -> {
+            String searchTerm = searchField.getText();
+            List<Book> searchResults = searchBooksByYear(searchTerm);
             displaySearchResults(searchResults);
         });
 
         frame.setVisible(true);
+    }
+
+    private static void loadBooks() {
+        try (BufferedReader br = new BufferedReader(new FileReader("./BooksDatasetClean.csv"))) {
+            String line;
+            br.readLine(); // Salta la riga dell'intestazione
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1); // Divide la stringa ignorando le virgole tra virgolette
+                if (parts.length >= 8) {
+                    String title = parts[0].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+                    String authors = parts[1].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+                    String description = parts[2].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+                    String category = parts[3].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+                    String publisher = parts[4].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+                    String price = parts[5].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+                    String publishMonth = parts[6].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+                    String publishYear = parts[7].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
+
+                    Book book = new Book(title, authors.split("\\|"), description, category, publisher, price, publishMonth, publishYear);
+                    allBooks.add(book);
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Errore durante il caricamento dei libri.");
+            e.printStackTrace();
+        }
     }
 
     private static void updateInterfaceForLoggedInUser() {
@@ -101,58 +150,85 @@ public class MainInterface {
         System.exit(0); // Termina l'applicazione
     }
 
-    private static List<Book> searchBooks(String searchTerm) {
+    private static List<Book> searchBooksByTitle(String searchTerm) {
         List<Book> results = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("./BooksDatasetClean.csv"))) {
-            String line;
-            br.readLine(); // Salta la riga dell'intestazione
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                String title = parts[0];
-                String[] authors = parts[1].split("\\|");
-                String description = parts[2];
-                String category = parts[3];
-                String publisher = parts[4];
-                String price = parts[5];
-                String publishMonth = parts[6];
-                String publishYear = parts[7];
-                Book book = new Book(title, authors, description, category, publisher, price, publishMonth, publishYear);
-                // Esegui la logica per la ricerca basata su searchTerm
-                if (title.contains(searchTerm) || containsIgnoreCase(authors, searchTerm) || category.contains(searchTerm)) {
-                    results.add(book);
-                }
+        for (Book book : allBooks) {
+            if (book.getTitle().toLowerCase().contains(searchTerm.toLowerCase())) {
+                results.add(book);
             }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Errore durante la ricerca dei libri.");
-            e.printStackTrace();
         }
         return results;
     }
 
-    private static boolean containsIgnoreCase(String[] array, String searchTerm) {
-        for (String str : array) {
-            if (str.trim().equalsIgnoreCase(searchTerm)) {
-                return true;
+    private static List<Book> searchBooksByAuthor(String searchTerm) {
+        List<Book> results = new ArrayList<>();
+        for (Book book : allBooks) {
+            for (String author : book.getAuthors()) {
+                if (author.toLowerCase().contains(searchTerm.toLowerCase())) {
+                    results.add(book);
+                    break; // Se trova almeno un'autore corrispondente, aggiunge il libro e passa al libro successivo
+                }
             }
         }
-        return false;
+        return results;
+    }
+
+    private static List<Book> searchBooksByYear(String searchTerm) {
+        List<Book> results = new ArrayList<>();
+        for (Book book : allBooks) {
+            if (book.getPublishYear().toLowerCase().contains(searchTerm.toLowerCase())) {
+                results.add(book);
+            }
+        }
+        return results;
     }
 
     private static void displaySearchResults(List<Book> searchResults) {
         JFrame searchResultsFrame = new JFrame("Risultati della ricerca");
-        JPanel resultsPanel = new JPanel(new GridLayout(searchResults.size(), 1));
+        searchResultsFrame.setSize(800, 600); // Imposta le dimensioni desiderate
+        searchResultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        String[] columnNames = {"Titolo", "Autori", "Descrizione", "Categoria", "Editore", "Prezzo", "Data di pubblicazione"};
+        Object[][] rowData = new Object[searchResults.size()][7];
+
+        int row = 0;
         for (Book book : searchResults) {
-            JLabel titleLabel = new JLabel("Titolo: " + book.getTitle());
-            JLabel authorsLabel = new JLabel("Autori: " + String.join(", ", book.getAuthors()));
-            JLabel categoryLabel = new JLabel("Categoria: " + book.getCategory());
-            // Aggiungi altre informazioni del libro se necessario
-            resultsPanel.add(titleLabel);
-            resultsPanel.add(authorsLabel);
-            resultsPanel.add(categoryLabel);
+            rowData[row][0] = book.getTitle();
+            rowData[row][1] = formatAuthors(book.getAuthors());
+            rowData[row][2] = book.getDescription();
+            rowData[row][3] = book.getCategory();
+            rowData[row][4] = book.getPublisher();
+            rowData[row][5] = book.getPrice(); // Formatta il prezzo con due decimali
+            rowData[row][6] = book.getPublishMonth() + " " + book.getPublishYear();
+            row++;
         }
-        searchResultsFrame.getContentPane().add(resultsPanel);
-        searchResultsFrame.pack();
+
+        DefaultTableModel model = new DefaultTableModel(rowData, columnNames);
+        JTable table = new JTable(model);
+        table.setFillsViewportHeight(true); // Riempie l'altezza della finestra con la tabella
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        // Aggiungi il pannello dei risultati alla finestra dei risultati
+        searchResultsFrame.getContentPane().add(scrollPane);
         searchResultsFrame.setLocationRelativeTo(null);
         searchResultsFrame.setVisible(true);
+    }
+
+    private static String formatAuthors(String[] authors) {
+        StringBuilder formattedAuthors = new StringBuilder();
+        for (String author : authors) {
+            String[] nameParts = author.split(",");
+            if (nameParts.length >= 2) {
+                String lastName = nameParts[0].trim();
+                String firstName = nameParts[1].trim();
+                formattedAuthors.append(firstName).append(" ").append(lastName).append(", ");
+            } else if (nameParts.length == 1) {
+                formattedAuthors.append(nameParts[0].trim()).append(", ");
+            }
+        }
+        if (formattedAuthors.length() > 0) {
+            formattedAuthors.deleteCharAt(formattedAuthors.length() - 2); // Rimuove l'ultima virgola
+        }
+        return formattedAuthors.toString();
     }
 }
