@@ -14,22 +14,21 @@ public class LoginForm extends JFrame {
     public LoginForm() {
         super("Login Form");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(300, 200);
+        setSize(350, 200);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Aggiunge un margine al pannello
 
-        JPanel inputPanel = new JPanel(new GridLayout(2, 2));
+        JPanel inputPanel = new JPanel(new GridLayout(2, 2, 10, 10)); // Aggiunge spaziatura tra le caselle
 
         JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setPreferredSize(new Dimension(100, 30)); // Imposta le dimensioni desiderate
         inputPanel.add(usernameLabel);
 
         usernameField = new JTextField();
         inputPanel.add(usernameField);
 
         JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setPreferredSize(new Dimension(100, 30)); // Imposta le dimensioni desiderate
         inputPanel.add(passwordLabel);
 
         passwordField = new JPasswordField();
@@ -38,10 +37,9 @@ public class LoginForm extends JFrame {
         panel.add(inputPanel, BorderLayout.NORTH);
 
         JButton loginButton = new JButton("Login");
-        loginButton.setPreferredSize(new Dimension(80, 30)); // Imposta la dimensione preferita
         loginButton.addActionListener(e -> {
             if (checkCredentials(usernameField.getText(), new String(passwordField.getPassword()))) {
-                JOptionPane.showMessageDialog(this, "Benvenuto nel bookrecommender!");
+                JOptionPane.showMessageDialog(this, "Benvenuto nel Book Recommender!");
                 if (loginListener != null) {
                     loginListener.onLogin(usernameField.getText());
                 }
@@ -51,7 +49,6 @@ public class LoginForm extends JFrame {
             }
         });
 
-        // Pannello aggiuntivo per allineare il pulsante al centro
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(loginButton);
 
@@ -85,4 +82,3 @@ public class LoginForm extends JFrame {
 interface LoginListener {
     void onLogin(String username);
 }
-

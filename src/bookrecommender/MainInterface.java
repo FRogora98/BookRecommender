@@ -32,12 +32,14 @@ public class MainInterface {
         frame.setLocationRelativeTo(null);
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.setBackground(Color.WHITE);
         topPanel.add(btnLogin);
         topPanel.add(btnLogout);
         topPanel.add(btnRegister);
         btnLogout.setVisible(false); // Initially the logout button is not visible
 
         JPanel centerPanel = new JPanel(new FlowLayout());
+        centerPanel.setBackground(Color.WHITE);
         JButton searchByTitleButton = new JButton("Cerca per Titolo");
         JButton searchByAuthorButton = new JButton("Cerca per Autore");
         JButton searchByYearButton = new JButton("Cerca per Anno di Uscita");
@@ -47,6 +49,7 @@ public class MainInterface {
         centerPanel.add(searchByYearButton);
 
         JPanel bottomPanel = new JPanel(new GridLayout(1, 5));
+        bottomPanel.setBackground(Color.WHITE);
         bottomPanel.add(btnAddBook);
         bottomPanel.add(btnReview);
         JButton btnShowBooks = new JButton("Mostra tutti i libri");
@@ -58,10 +61,22 @@ public class MainInterface {
         btnReview.setVisible(false);
 
         frame.setLayout(new BorderLayout());
+        frame.getContentPane().setBackground(Color.WHITE);
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(centerPanel, BorderLayout.CENTER);
         frame.add(bottomPanel, BorderLayout.SOUTH);
         frame.add(lblUsername, BorderLayout.WEST);
+
+        btnLogin.setBackground(Color.WHITE);
+        btnLogout.setBackground(Color.WHITE);
+        btnRegister.setBackground(Color.WHITE);
+        searchByTitleButton.setBackground(Color.LIGHT_GRAY);
+        searchByAuthorButton.setBackground(Color.LIGHT_GRAY);
+        searchByYearButton.setBackground(Color.LIGHT_GRAY);
+        btnShowBooks.setBackground(Color.WHITE);
+        btnExit.setBackground(Color.WHITE);
+
+        frame.setVisible(true);
 
         btnLogin.addActionListener(e -> {
             LoginForm loginForm = new LoginForm();
@@ -225,6 +240,6 @@ public class MainInterface {
     }
 
     private static void openBookForm(Book book) {
-        BookForm bookForm = new BookForm(book);
+        BookForm ookForm = new BookForm(book);
     }
 }

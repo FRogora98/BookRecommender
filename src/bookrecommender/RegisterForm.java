@@ -11,15 +11,15 @@ public class RegisterForm extends JFrame {
     private JTextField mailField;
     private JTextField fiscalCodeField;
     private JTextField usernameField;
-    private JTextField passField;
+    private JPasswordField passField;
 
     public RegisterForm() {
         super("Registrazione");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(300, 200);
+        setSize(350, 250);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(7, 2));
+        JPanel panel = new JPanel(new GridLayout(7, 2, 10, 10)); // Aggiunge spaziatura tra le caselle
 
         panel.add(new JLabel("Nome:"));
         firstNameField = new JTextField();
@@ -42,7 +42,7 @@ public class RegisterForm extends JFrame {
         panel.add(usernameField);
 
         panel.add(new JLabel("Password:"));
-        passField = new JTextField();
+        passField = new JPasswordField(); // Utilizza JPasswordField per la password
         panel.add(passField);
 
         JButton registerButton = new JButton("Registra");
@@ -52,7 +52,7 @@ public class RegisterForm extends JFrame {
             String mail = mailField.getText();
             String fiscalCode = fiscalCodeField.getText();
             String username = usernameField.getText();
-            String password = passField.getText();
+            String password = new String(passField.getPassword()); // Ottiene la password come stringa
 
             if (firstName.isEmpty() || lastName.isEmpty() || mail.isEmpty() || fiscalCode.isEmpty() || username.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Completa tutti i campi.");
