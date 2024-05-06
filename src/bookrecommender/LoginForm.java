@@ -17,17 +17,28 @@ public class LoginForm extends JFrame {
         setSize(300, 200);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridLayout(3, 2));
+        JPanel panel = new JPanel(new BorderLayout());
 
-        panel.add(new JLabel("Username:"));
+        JPanel inputPanel = new JPanel(new GridLayout(2, 2));
+
+        JLabel usernameLabel = new JLabel("Username:");
+        usernameLabel.setPreferredSize(new Dimension(100, 30)); // Imposta le dimensioni desiderate
+        inputPanel.add(usernameLabel);
+
         usernameField = new JTextField();
-        panel.add(usernameField);
+        inputPanel.add(usernameField);
 
-        panel.add(new JLabel("Password:"));
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setPreferredSize(new Dimension(100, 30)); // Imposta le dimensioni desiderate
+        inputPanel.add(passwordLabel);
+
         passwordField = new JPasswordField();
-        panel.add(passwordField);
+        inputPanel.add(passwordField);
+
+        panel.add(inputPanel, BorderLayout.NORTH);
 
         JButton loginButton = new JButton("Login");
+        loginButton.setPreferredSize(new Dimension(80, 30)); // Imposta la dimensione preferita
         loginButton.addActionListener(e -> {
             if (checkCredentials(usernameField.getText(), new String(passwordField.getPassword()))) {
                 JOptionPane.showMessageDialog(this, "Benvenuto nel bookrecommender!");
@@ -39,7 +50,12 @@ public class LoginForm extends JFrame {
                 JOptionPane.showMessageDialog(this, "Login fallito. Riprova.");
             }
         });
-        panel.add(loginButton);
+
+        // Pannello aggiuntivo per allineare il pulsante al centro
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(loginButton);
+
+        panel.add(buttonPanel, BorderLayout.CENTER);
 
         add(panel);
         setVisible(true);
@@ -69,3 +85,4 @@ public class LoginForm extends JFrame {
 interface LoginListener {
     void onLogin(String username);
 }
+
