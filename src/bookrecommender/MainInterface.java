@@ -12,6 +12,7 @@ public class MainInterface {
     private static JButton btnAddBook = new JButton("Aggiungi libro");
     private static JButton btnReview = new JButton("Scrivi recensione");
     private static JButton btnRegister = new JButton("Registrati");
+    private static JButton btnSearchBooks = new JButton("Cerca Libri");
 
     public static void main(String[] args) {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -22,6 +23,7 @@ public class MainInterface {
         topPanel.add(btnLogin);
         topPanel.add(btnLogout);
         topPanel.add(btnRegister);
+        topPanel.add(btnSearchBooks);
         btnLogout.setVisible(false); // Initially the logout button is not visible
 
         JPanel centerPanel = new JPanel(new FlowLayout());
@@ -73,6 +75,11 @@ public class MainInterface {
             exitApplication();
         });
 
+        btnSearchBooks.addActionListener(e -> {
+            SearchBookForm searchBookForm = new SearchBookForm();
+            searchBookForm.setVisible(true);
+        });
+
         frame.setVisible(true);
     }
 
@@ -82,10 +89,6 @@ public class MainInterface {
         btnRegister.setVisible(!isLoggedIn); // Show register button only when not logged in
         btnAddBook.setVisible(isLoggedIn);
         btnReview.setVisible(isLoggedIn);
-    }
-
-    interface LoginListener {
-        void onLogin(String username);
     }
 
     private static void exitApplication() {

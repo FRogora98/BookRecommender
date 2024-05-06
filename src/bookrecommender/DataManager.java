@@ -18,9 +18,9 @@ public class DataManager {
                     String description = data[2].trim();
                     String category = data[3].trim();
                     String publisher = data[4].trim();
-                    double price = Double.parseDouble(data[5].trim().substring(1)); // Assuming the price starts with $
-                    int publishMonth = Integer.parseInt(data[6].trim());
-                    int publishYear = Integer.parseInt(data[7].trim());
+                    String price = data[5].trim(); // Assuming the price starts with $
+                    String publishMonth = data[6].trim();
+                    String publishYear = data[7].trim();
                     books.add(new Book(title, authors, description, category, publisher, price, publishMonth, publishYear));
                 }
             }

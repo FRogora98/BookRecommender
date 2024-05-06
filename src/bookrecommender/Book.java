@@ -3,14 +3,14 @@ package bookrecommender;
 public class Book {
     private String title;
     private String[] authors;
-    private int publishYear;
-    private int publishMonth;
+    private String publishYear;
+    private String publishMonth;
     private String publisher; // Opzionale
     private String description; 
     private String category; // Opzionale
-    private double price;
+    private String price;
 
-    public Book(String title, String[] authors, String description, String category, String publisher, double price, int publishMonth, int publishYear) {
+    public Book(String title, String[] authors, String description, String category, String publisher, String price, String publishMonth, String publishYear) {
     this.title = title;
     this.authors = authors;
     this.description = description;
@@ -38,19 +38,19 @@ public class Book {
         this.authors = authors;
     }
 
-    public int getPublishYear() {
+    public String getPublishYear() {
         return publishYear;
     }
 
-    public void setPublicationYear(int publishYear) {
+    public void setPublicationYear(String publishYear) {
         this.publishYear = publishYear;
     }
 
-    public int getPublishMonth() {
+    public String getPublishMonth() {
         return publishMonth;
     }
 
-    public void setPublicationMonth(int publishMonth) {
+    public void setPublicationMonth(String publishMonth) {
         this.publishMonth = publishMonth;
     }
 
@@ -78,11 +78,11 @@ public class Book {
         this.description = description;
     }
 
-    public double getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 }
