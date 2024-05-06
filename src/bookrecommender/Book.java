@@ -2,7 +2,7 @@ package bookrecommender;
 
 public class Book {
     private String title;
-    private String[] authors;
+    private String authors;
     private String publishYear;
     private String publishMonth;
     private String publisher; // Opzionale
@@ -10,7 +10,7 @@ public class Book {
     private String category; // Opzionale
     private String price;
 
-    public Book(String title, String[] authors, String description, String category, String publisher, String price, String publishMonth, String publishYear) {
+    public Book(String title, String authors, String description, String category, String publisher, String price, String publishMonth, String publishYear) {
     this.title = title;
     this.authors = authors;
     this.description = description;
@@ -30,11 +30,11 @@ public class Book {
         this.title = title;
     }
 
-    public String[] getAuthors() {
+    public String getAuthors() {
         return authors;
     }
 
-    public void setAuthors(String[] authors) {
+    public void setAuthors(String authors) {
         this.authors = authors;
     }
 

@@ -14,7 +14,7 @@ public class DataManager {
                 String[] data = line.split(",");
                 if (data.length >= 8) {
                     String title = data[0].trim();
-                    String[] authors = data[1].trim().split(";");
+                    String authors = data[1].trim();
                     String description = data[2].trim();
                     String category = data[3].trim();
                     String publisher = data[4].trim();

@@ -127,7 +127,7 @@ public class MainInterface {
                     String publishMonth = parts[6].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
                     String publishYear = parts[7].replaceAll("^\"|\"$", ""); // Rimuove eventuali virgolette dagli estremi della stringa
 
-                    Book book = new Book(title, authors.split("\\|"), description, category, publisher, price, publishMonth, publishYear);
+                    Book book = new Book(title, authors, description, category, publisher, price, publishMonth, publishYear);
                     allBooks.add(book);
                 }
             }
@@ -163,11 +163,8 @@ public class MainInterface {
     private static List<Book> searchBooksByAuthor(String searchTerm) {
         List<Book> results = new ArrayList<>();
         for (Book book : allBooks) {
-            for (String author : book.getAuthors()) {
-                if (author.toLowerCase().contains(searchTerm.toLowerCase())) {
-                    results.add(book);
-                    break; // Se trova almeno un'autore corrispondente, aggiunge il libro e passa al libro successivo
-                }
+            if (book.getAuthors().toLowerCase().contains(searchTerm.toLowerCase())) {
+                results.add(book);
             }
         }
         return results;
@@ -187,48 +184,29 @@ public class MainInterface {
         JFrame searchResultsFrame = new JFrame("Risultati della ricerca");
         searchResultsFrame.setSize(800, 600); // Imposta le dimensioni desiderate
         searchResultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+    
         String[] columnNames = {"Titolo", "Autori", "Descrizione", "Categoria", "Editore", "Prezzo", "Data di pubblicazione"};
-        Object[][] rowData = new Object[searchResults.size()][7];
-
-        int row = 0;
+        DefaultTableModel model = new DefaultTableModel(null, columnNames); // Crea un nuovo modello vuoto
+    
         for (Book book : searchResults) {
-            rowData[row][0] = book.getTitle();
-            rowData[row][1] = formatAuthors(book.getAuthors());
-            rowData[row][2] = book.getDescription();
-            rowData[row][3] = book.getCategory();
-            rowData[row][4] = book.getPublisher();
-            rowData[row][5] = book.getPrice(); // Formatta il prezzo con due decimali
-            rowData[row][6] = book.getPublishMonth() + " " + book.getPublishYear();
-            row++;
+            Object[] rowData = new Object[7];
+            rowData[0] = book.getTitle();
+            rowData[1] = book.getAuthors();
+            rowData[2] = book.getDescription();
+            rowData[3] = book.getCategory();
+            rowData[4] = book.getPublisher();
+            rowData[5] = book.getPrice(); // Formatta il prezzo con due decimali
+            rowData[6] = book.getPublishMonth() + " " + book.getPublishYear();
+            model.addRow(rowData); // Aggiungi riga al modello
         }
-
-        DefaultTableModel model = new DefaultTableModel(rowData, columnNames);
+    
         JTable table = new JTable(model);
         table.setFillsViewportHeight(true); // Riempie l'altezza della finestra con la tabella
         JScrollPane scrollPane = new JScrollPane(table);
-
+    
         // Aggiungi il pannello dei risultati alla finestra dei risultati
         searchResultsFrame.getContentPane().add(scrollPane);
         searchResultsFrame.setLocationRelativeTo(null);
         searchResultsFrame.setVisible(true);
-    }
-
-    private static String formatAuthors(String[] authors) {
-        StringBuilder formattedAuthors = new StringBuilder();
-        for (String author : authors) {
-            String[] nameParts = author.split(",");
-            if (nameParts.length >= 2) {
-                String lastName = nameParts[0].trim();
-                String firstName = nameParts[1].trim();
-                formattedAuthors.append(firstName).append(" ").append(lastName).append(", ");
-            } else if (nameParts.length == 1) {
-                formattedAuthors.append(nameParts[0].trim()).append(", ");
-            }
-        }
-        if (formattedAuthors.length() > 0) {
-            formattedAuthors.deleteCharAt(formattedAuthors.length() - 2); // Rimuove l'ultima virgola
-        }
-        return formattedAuthors.toString();
     }
 }
