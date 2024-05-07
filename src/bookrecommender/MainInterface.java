@@ -7,7 +7,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,14 +139,9 @@ public class MainInterface {
                 if (parts.length >= 8) {
                     String title = parts[0].replaceAll("^\"|\"$", ""); 
                     String authors = parts[1].replaceAll("^\"|\"$", ""); 
-                    String description = parts[2].replaceAll("^\"|\"$", "");
-                    String category = parts[3].replaceAll("^\"|\"$", "");
-                    String publisher = parts[4].replaceAll("^\"|\"$", "");
-                    String price = parts[5].replaceAll("^\"|\"$", "");
-                    String publishMonth = parts[6].replaceAll("^\"|\"$", "");
                     String publishYear = parts[7].replaceAll("^\"|\"$", "");
 
-                    Book book = new Book(title, authors, description, category, publisher, price, publishMonth, publishYear);
+                    Book book = new Book(title, authors, publishYear);
                     allBooks.add(book);
                 }
             }
@@ -209,11 +206,7 @@ public class MainInterface {
             Object[] rowData = new Object[7];
             rowData[0] = book.getTitle();
             rowData[1] = book.getAuthors();
-            rowData[2] = book.getDescription();
-            rowData[3] = book.getCategory();
-            rowData[4] = book.getPublisher();
-            rowData[5] = book.getPrice(); // Formatta il prezzo con due decimali
-            rowData[6] = book.getPublishMonth() + " " + book.getPublishYear();
+            rowData[6] = book.getPublishYear();
             model.addRow(rowData); // Aggiungi riga al modello
         }
     
@@ -240,6 +233,6 @@ public class MainInterface {
     }
 
     private static void openBookForm(Book book) {
-        BookForm ookForm = new BookForm(book);
+        BookForm bookForm = new BookForm(book);
     }
 }
