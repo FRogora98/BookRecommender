@@ -17,8 +17,7 @@ public class MainInterface {
     private static boolean isLoggedIn = false;
     private static JButton btnLogin = new JButton("Login");
     private static JButton btnLogout = new JButton("Logout");
-    private static JButton btnAddBook = new JButton("Aggiungi libro");
-    private static JButton btnReview = new JButton("Scrivi recensione");
+    private static JButton btnLibrary = new JButton("MyLibrary");
     private static JButton btnRegister = new JButton("Registrati");
     private static JTextField searchField = new JTextField(20);
     private static List<Book> allBooks = new ArrayList<>(); // Lista di tutti i libri caricati una sola volta
@@ -36,6 +35,7 @@ public class MainInterface {
         topPanel.add(btnLogin);
         topPanel.add(btnLogout);
         topPanel.add(btnRegister);
+        topPanel.add(btnLibrary);
         btnLogout.setVisible(false); // Initially the logout button is not visible
 
         JPanel centerPanel = new JPanel(new FlowLayout());
@@ -50,13 +50,11 @@ public class MainInterface {
 
         JPanel bottomPanel = new JPanel(new GridLayout(1, 5));
         bottomPanel.setBackground(Color.WHITE);
-        bottomPanel.add(btnAddBook);
-        bottomPanel.add(btnReview);
+        bottomPanel.add(btnLibrary);
         JButton btnExit = new JButton("Esci");
         bottomPanel.add(btnExit);
 
-        btnAddBook.setVisible(false);
-        btnReview.setVisible(false);
+        btnLibrary.setVisible(false);
 
         frame.setLayout(new BorderLayout());
         frame.getContentPane().setBackground(Color.WHITE);
@@ -68,6 +66,7 @@ public class MainInterface {
         btnLogin.setBackground(Color.WHITE);
         btnLogout.setBackground(Color.WHITE);
         btnRegister.setBackground(Color.WHITE);
+        btnLibrary.setBackground(Color.WHITE);
         searchByTitleButton.setBackground(Color.LIGHT_GRAY);
         searchByAuthorButton.setBackground(Color.LIGHT_GRAY);
         searchByYearButton.setBackground(Color.LIGHT_GRAY);
@@ -122,6 +121,12 @@ public class MainInterface {
             displaySearchResults(searchResults);
         });
 
+        // Aggiungi un listener per il bottone MyLibrary
+        btnLibrary.addActionListener(e -> {
+            MyLibraryForm myLibraryForm = new MyLibraryForm();
+            myLibraryForm.setVisible(true);
+        });
+
         frame.setVisible(true);
     }
 
@@ -150,8 +155,7 @@ public class MainInterface {
         btnLogin.setVisible(!isLoggedIn);
         btnLogout.setVisible(isLoggedIn);
         btnRegister.setVisible(!isLoggedIn); // Show register button only when not logged in
-        btnAddBook.setVisible(isLoggedIn);
-        btnReview.setVisible(isLoggedIn);
+        btnLibrary.setVisible(isLoggedIn);
     }
 
     private static void exitApplication() {
