@@ -7,9 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,20 +129,18 @@ public class MainInterface {
     }
 
     private static void loadBooks() {
-        try (BufferedReader br = new BufferedReader(new FileReader("./BooksDatasetClean.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("./data/Libri.csv"))) {
             String line;
             br.readLine(); // Salta la riga dell'intestazione
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1); 
-                if (parts.length >= 8) {
+                if (parts.length >= 3) {
                     String title = parts[0].replaceAll("^\"|\"$", ""); 
                     String authors = parts[1].replaceAll("^\"|\"$", ""); 
-                    String publishYear = parts[7].replaceAll("^\"|\"$", "");
+                    String publishYear = parts[2].replaceAll("^\"|\"$", "");
 
                     Book book = new Book(title, authors, publishYear);
-                    allBooks.add(book);
-
-                    
+                    allBooks.add(book);                    
                 }
             }
         } catch (IOException e) {
