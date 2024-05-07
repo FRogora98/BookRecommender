@@ -52,9 +52,7 @@ public class MainInterface {
         bottomPanel.setBackground(Color.WHITE);
         bottomPanel.add(btnAddBook);
         bottomPanel.add(btnReview);
-        JButton btnShowBooks = new JButton("Mostra tutti i libri");
         JButton btnExit = new JButton("Esci");
-        bottomPanel.add(btnShowBooks);
         bottomPanel.add(btnExit);
 
         btnAddBook.setVisible(false);
@@ -73,7 +71,6 @@ public class MainInterface {
         searchByTitleButton.setBackground(Color.LIGHT_GRAY);
         searchByAuthorButton.setBackground(Color.LIGHT_GRAY);
         searchByYearButton.setBackground(Color.LIGHT_GRAY);
-        btnShowBooks.setBackground(Color.WHITE);
         btnExit.setBackground(Color.WHITE);
 
         frame.setVisible(true);
