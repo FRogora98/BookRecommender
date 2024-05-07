@@ -7,7 +7,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,6 +143,8 @@ public class MainInterface {
 
                     Book book = new Book(title, authors, publishYear);
                     allBooks.add(book);
+
+                    
                 }
             }
         } catch (IOException e) {
@@ -197,14 +201,14 @@ public class MainInterface {
         searchResultsFrame.setSize(800, 600); // Imposta le dimensioni desiderate
         searchResultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     
-        String[] columnNames = {"Titolo", "Autori", "Descrizione", "Categoria", "Editore", "Prezzo", "Data di pubblicazione"};
+        String[] columnNames = {"Titolo", "Autori", "Data di pubblicazione"};
         DefaultTableModel model = new DefaultTableModel(null, columnNames); // Crea un nuovo modello vuoto
     
         for (Book book : searchResults) {
             Object[] rowData = new Object[7];
             rowData[0] = book.getTitle();
             rowData[1] = book.getAuthors();
-            rowData[6] = book.getPublishYear();
+            rowData[2] = book.getPublishYear();
             model.addRow(rowData); // Aggiungi riga al modello
         }
     
