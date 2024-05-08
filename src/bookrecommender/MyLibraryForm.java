@@ -2,55 +2,108 @@ package bookrecommender;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MyLibraryForm extends JFrame {
+    private DefaultListModel<String> libraryModel;
     private JList<String> libraryList;
-    private DefaultListModel<String> listModel;
-    private JButton btnCreate;
+    private JButton createButton;
+    private JButton showLibrariesButton;
 
     public MyLibraryForm() {
         setTitle("My Library");
-        setSize(800, 400);
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel(new BorderLayout());
+        libraryModel = new DefaultListModel<>();
+        libraryList = new JList<>(libraryModel);
+        add(new JScrollPane(libraryList), BorderLayout.CENTER);
 
-        listModel = new DefaultListModel<>();
-        libraryList = new JList<>(listModel);
-        JScrollPane scrollPane = new JScrollPane(libraryList);
+        createButton = new JButton("Crea Libreria");
+        createButton.addActionListener(this::createLibrary);
+        showLibrariesButton = new JButton("Mostra Librerie");
+        showLibrariesButton.addActionListener(this::showLibraries);
 
-        panel.add(scrollPane, BorderLayout.CENTER);
+        JPanel southPanel = new JPanel();
+        southPanel.add(createButton);
+        southPanel.add(showLibrariesButton);
+        add(southPanel, BorderLayout.SOUTH);
 
-        // Aggiungi il pulsante "Crea" in alto a sinistra
-        btnCreate = new JButton("Crea");
-        btnCreate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                createNewLibrary();
-            }
-        });
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.add(btnCreate);
-        panel.add(topPanel, BorderLayout.NORTH);
-
-        add(panel);
+        loadBooksIntoList();
+        setVisible(true);
     }
 
-    public void setLibrary(List<String> library) {
-        listModel.clear();
-        for (String book : library) {
-            listModel.addElement(book);
+    private void createLibrary(ActionEvent e) {
+        String libraryName = JOptionPane.showInputDialog(this, "Nome della Libreria:", "Creazione Libreria",
+                JOptionPane.PLAIN_MESSAGE);
+        if (libraryName != null && !libraryName.isEmpty()) {
+            List<String> selectedBooks = libraryList.getSelectedValuesList();
+            if (!selectedBooks.isEmpty()) {
+                saveLibrary(libraryName, selectedBooks);
+                JOptionPane.showMessageDialog(this, "Libreria '" + libraryName + "' creata con successo!", "Successo",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Seleziona almeno un libro per la libreria.", "Errore",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
-    private void createNewLibrary() {
-        // Implementa la logica per la creazione di una nuova libreria qui
-        // Puoi aprire una finestra di dialogo per consentire all'utente di selezionare i libri
-        // E quindi salvare i dettagli della nuova libreria nel file CSV
-        JOptionPane.showMessageDialog(this, "Funzionalità di creazione di libreria da implementare.");
+    private void showLibraries(ActionEvent e) {
+        JFrame librariesFrame = new JFrame("Librerie Esistenti");
+        librariesFrame.setSize(400, 300);
+        librariesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        librariesFrame.setLocationRelativeTo(this);
+
+        DefaultListModel<String> librariesModel = new DefaultListModel<>();
+        JList<String> librariesList = new JList<>(librariesModel);
+        librariesFrame.add(new JScrollPane(librariesList));
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("./data/Librerie.csv"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                librariesModel.addElement(line);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errore durante il caricamento delle librerie.", "Errore",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        librariesFrame.setVisible(true);
+    }
+
+    private void loadBooksIntoList() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("./data/Libri.csv"))) {
+            String line;
+            reader.readLine(); // Skip header
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length >= 3) {
+                    String bookEntry = data[0] + " - " + data[1] + " - " + data[2];
+                    libraryModel.addElement(bookEntry);
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errore durante il caricamento dei libri.", "Errore",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void saveLibrary(String libraryName, List<String> selectedBooks) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("./data/Librerie.csv", true))) {
+            for (String book : selectedBooks) {
+                writer.write(libraryName + "," + book + "\n");
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errore durante il salvataggio della libreria.", "Errore",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
