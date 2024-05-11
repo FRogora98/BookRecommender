@@ -131,6 +131,11 @@ public class MainInterface {
         });
 
         frame.setVisible(true);
+
+        btnSearchBooks.addActionListener(e -> {
+            SearchBookForm searchBookForm = new SearchBookForm(allBooks);
+            searchBookForm.setVisible(true);
+        });
     }
 
     private static void loadBooks() {
