@@ -328,6 +328,11 @@ public class MainInterface {
             SearchBookForm searchBookForm = new SearchBookForm(allBooks);
             searchBookForm.setVisible(true);
         });
+
+        btnLibrary.addActionListener(e -> {
+            MyLibraryForm myLibraryForm = new MyLibraryForm();
+            myLibraryForm.setVisible(true);
+        });
     }
 
     private static void loadBooks() {

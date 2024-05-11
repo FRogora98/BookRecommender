@@ -7,9 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SearchBookForm extends JFrame {
-    private JTextField searchField = new JTextField(20);
+    private JTextField searchFieldTitle = new JTextField(15);
+    private JTextField searchFieldAuthor = new JTextField(15);
+    private JTextField searchFieldYear = new JTextField(8);
     private DefaultTableModel model;
     private JTable table;
     private List<Book> allBooks;
@@ -20,78 +23,74 @@ public class SearchBookForm extends JFrame {
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JPanel panel = new JPanel(new BorderLayout());
+        setLocationRelativeTo(null);
 
-        JPanel searchPanel = new JPanel();
-        searchPanel.setBackground(Color.WHITE);
-        searchPanel.add(new JLabel("Inserisci il termine di ricerca:"));
-        searchPanel.add(searchField);
-        
-        // Aggiunta dei bottoni per la ricerca per titolo, autore e anno
-        JButton searchByTitleButton = new JButton("Cerca Titolo");
-        JButton searchByAuthorButton = new JButton("Cerca Autore");
-        JButton searchByYearButton = new JButton("Cerca Anno");
-        searchByTitleButton.addActionListener(this::searchByTitle);
-        searchByAuthorButton.addActionListener(this::searchByAuthor);
-        searchByYearButton.addActionListener(this::searchByYear);
-        searchPanel.add(searchByTitleButton);
-        searchPanel.add(searchByAuthorButton);
-        searchPanel.add(searchByYearButton);
-        
-        panel.add(searchPanel, BorderLayout.NORTH);
+        JPanel panel = new JPanel(new BorderLayout());
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        searchPanel.add(new JLabel("Titolo:"));
+        searchPanel.add(searchFieldTitle);
+        searchPanel.add(new JLabel("Autore:"));
+        searchPanel.add(searchFieldAuthor);
+        searchPanel.add(new JLabel("Anno:"));
+        searchPanel.add(searchFieldYear);
+
+        JButton searchButton = new JButton("Cerca");
+        searchButton.addActionListener(this::performSearch);
+        searchPanel.add(searchButton);
 
         model = new DefaultTableModel(new String[]{"Titolo", "Autori", "Anno di pubblicazione"}, 0);
         table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+        panel.add(searchPanel, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        add(panel);
+        setVisible(true);
+
+        // Aggiungi un listener per fare clic su un libro nella tabella dei risultati di ricerca
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
-                if (row >= 0 && row < allBooks.size()) {
-                    Book selectedBook = allBooks.get(row);
-                    displayBookDetails(selectedBook);
+                int column = table.columnAtPoint(e.getPoint());
+                if (row >= 0 && column >= 0) {
+                    openBookForm(row);
                 }
             }
         });
-        JScrollPane scrollPane = new JScrollPane(table);
-        panel.add(scrollPane, BorderLayout.CENTER);
+    }
 
-        add(panel);
+    private void performSearch(ActionEvent e) {
+        String titleFilter = searchFieldTitle.getText().toLowerCase();
+        String authorFilter = searchFieldAuthor.getText().toLowerCase();
+        String yearFilter = searchFieldYear.getText().toLowerCase();
+
+        List<Book> filteredBooks = allBooks.stream()
+                .filter(book -> book.getTitle().toLowerCase().contains(titleFilter))
+                .filter(book -> book.getAuthors().toLowerCase().contains(authorFilter))
+                .filter(book -> book.getPublishYear().toLowerCase().contains(yearFilter))
+                .collect(Collectors.toList());
+
+        updateTable(filteredBooks);
     }
-    
-    // Metodo per la ricerca per titolo
-    private void searchByTitle(ActionEvent e) {
-        String searchTerm = searchField.getText();
-        model.setRowCount(0); // Clear table
-        for (Book book : allBooks) {
-            if (book.getTitle().toLowerCase().contains(searchTerm.toLowerCase())) {
-                model.addRow(new Object[]{book.getTitle(), book.getAuthors(), book.getPublishYear()});
-            }
-        }
-    }
-    
-    // Metodo per la ricerca per autore
-    private void searchByAuthor(ActionEvent e) {
-        String searchTerm = searchField.getText();
-        model.setRowCount(0); // Clear table
-        for (Book book : allBooks) {
-            if (book.getAuthors().toLowerCase().contains(searchTerm.toLowerCase())) {
-                model.addRow(new Object[]{book.getTitle(), book.getAuthors(), book.getPublishYear()});
-            }
-        }
-    }
-    
-    // Metodo per la ricerca per anno di pubblicazione
-    private void searchByYear(ActionEvent e) {
-        String searchTerm = searchField.getText();
-        model.setRowCount(0); // Clear table
-        for (Book book : allBooks) {
-            if (book.getPublishYear().toLowerCase().contains(searchTerm.toLowerCase())) {
-                model.addRow(new Object[]{book.getTitle(), book.getAuthors(), book.getPublishYear()});
-            }
+
+    private void updateTable(List<Book> books) {
+        model.setRowCount(0);
+        for (Book book : books) {
+            model.addRow(new Object[]{book.getTitle(), book.getAuthors(), book.getPublishYear()});
         }
     }
 
-    private void displayBookDetails(Book book) {
-        // Implement your code to display book details
+    private void openBookForm(int rowIndex) {
+        if (rowIndex >= 0 && rowIndex < table.getRowCount()) {
+            String title = (String) model.getValueAt(rowIndex, 0);
+            String authors = (String) model.getValueAt(rowIndex, 1);
+            String publishYear = (String) model.getValueAt(rowIndex, 2);
+
+            Book book = new Book(title, authors, publishYear);
+            new BookForm(book);
+        }
     }
 }
