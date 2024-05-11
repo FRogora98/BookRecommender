@@ -18,6 +18,7 @@ public class MainInterface {
     private static JButton btnLogin = new JButton("Login");
     private static JButton btnLogout = new JButton("Logout");
     private static JButton btnLibrary = new JButton("MyLibrary");
+    private static JButton btnSearchBooks = new JButton("Cerca Libri");
     private static JButton btnRegister = new JButton("Registrati");
     private static JTextField searchField = new JTextField(20);
     private static List<Book> allBooks = new ArrayList<>(); // Lista di tutti i libri caricati una sola volta
@@ -35,6 +36,7 @@ public class MainInterface {
         topPanel.add(btnLogin);
         topPanel.add(btnLogout);
         topPanel.add(btnRegister);
+        topPanel.add(btnSearchBooks);
         topPanel.add(btnLibrary);
         btnLogout.setVisible(false); // Initially the logout button is not visible
 
@@ -114,7 +116,8 @@ public class MainInterface {
             displaySearchResults(searchResults);
         });
 
-        // Aggiungi un listener per l'evento di pressione del tasto "Cerca per Anno di Uscita"
+        // Aggiungi un listener per l'evento di pressione del tasto "Cerca per Anno di
+        // Uscita"
         searchByYearButton.addActionListener(e -> {
             String searchTerm = searchField.getText();
             List<Book> searchResults = searchBooksByYear(searchTerm);
@@ -135,14 +138,14 @@ public class MainInterface {
             String line;
             br.readLine(); // Salta la riga dell'intestazione
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1); 
+                String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
                 if (parts.length >= 3) {
-                    String title = parts[0].replaceAll("^\"|\"$", ""); 
-                    String authors = parts[1].replaceAll("^\"|\"$", ""); 
+                    String title = parts[0].replaceAll("^\"|\"$", "");
+                    String authors = parts[1].replaceAll("^\"|\"$", "");
                     String publishYear = parts[2].replaceAll("^\"|\"$", "");
 
                     Book book = new Book(title, authors, publishYear);
-                    allBooks.add(book);                    
+                    allBooks.add(book);
                 }
             }
         } catch (IOException e) {
@@ -197,10 +200,10 @@ public class MainInterface {
         JFrame searchResultsFrame = new JFrame("Risultati della ricerca");
         searchResultsFrame.setSize(800, 600); // Imposta le dimensioni desiderate
         searchResultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    
-        String[] columnNames = {"Titolo", "Autori", "Data di pubblicazione"};
+
+        String[] columnNames = { "Titolo", "Autori", "Data di pubblicazione" };
         DefaultTableModel model = new DefaultTableModel(null, columnNames); // Crea un nuovo modello vuoto
-    
+
         for (Book book : searchResults) {
             Object[] rowData = new Object[7];
             rowData[0] = book.getTitle();
@@ -208,11 +211,11 @@ public class MainInterface {
             rowData[2] = book.getPublishYear();
             model.addRow(rowData); // Aggiungi riga al modello
         }
-    
+
         JTable table = new JTable(model);
         table.setFillsViewportHeight(true); // Riempie l'altezza della finestra con la tabella
         JScrollPane scrollPane = new JScrollPane(table);
-    
+
         // Aggiungi un listener di mouse per la tabella dei risultati della ricerca
         table.addMouseListener(new MouseAdapter() {
             @Override
