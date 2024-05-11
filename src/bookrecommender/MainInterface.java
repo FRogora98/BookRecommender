@@ -26,10 +26,10 @@ public class MainInterface {
         frame.setLocationRelativeTo(null);
 
         // Impostazione dello sfondo
-        // ImageIcon backgroundImage = new ImageIcon("./library.jpg");
-        // JLabel background = new JLabel(backgroundImage);
-        // frame.setContentPane(background);
-        // background.setLayout(new BorderLayout());
+        ImageIcon backgroundImage = new ImageIcon("path/to/your/image.jpg");
+        JLabel background = new JLabel(backgroundImage);
+        frame.setContentPane(background);
+        background.setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel(new GridBagLayout());
         topPanel.setOpaque(false);
