@@ -18,10 +18,10 @@ public class MainInterface {
     private static JButton btnRegister = new JButton("Registrati");
     private static JButton btnSearchBooks = new JButton("Cerca Libri");
     private static List<Book> allBooks = new ArrayList<>();
+    private static String user;
 
     public static void main(String[] args) {
         loadBooks();
-        loadUsers();
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 400);
@@ -67,6 +67,7 @@ public class MainInterface {
             LoginForm loginForm = new LoginForm();
             loginForm.setLoginListener(username -> {
                 lblUsername.setText("Benvenuto, " + username);
+                user = username;
                 lblUsername.setVisible(true);
                 isLoggedIn = true;
                 updateInterfaceForLoggedInUser();
@@ -76,6 +77,7 @@ public class MainInterface {
 
         btnLogout.addActionListener(e -> {
             isLoggedIn = false;
+            user = "";
             lblUsername.setVisible(false);
             updateInterfaceForLoggedInUser();
         });
@@ -95,7 +97,7 @@ public class MainInterface {
         });
 
         btnLibrary.addActionListener(e -> {
-            MyLibraryForm myLibraryForm = new MyLibraryForm(allBooks);
+            MyLibraryForm myLibraryForm = new MyLibraryForm(allBooks, user);
             myLibraryForm.setVisible(true);
         });
     }

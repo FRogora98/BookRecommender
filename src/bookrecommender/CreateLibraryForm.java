@@ -10,8 +10,10 @@ import java.io.IOException;
 public class CreateLibraryForm extends JFrame {
     private JTextField libraryNameField;
     private JButton createButton;
+    private static String owner;
 
-    public CreateLibraryForm() {
+    public CreateLibraryForm(String user) {
+        owner = user;
         setTitle("Crea Libreria");
         setSize(400, 150);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -37,7 +39,7 @@ public class CreateLibraryForm extends JFrame {
     private void createLibrary(ActionEvent e) {
         String libraryName = libraryNameField.getText();
         if (!libraryName.isEmpty()) {
-            Library newLibrary = new Library(libraryName);
+            Library newLibrary = new Library(libraryName, owner);
             saveLibrary(newLibrary);
             JOptionPane.showMessageDialog(this, "Libreria creata con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
             dispose();

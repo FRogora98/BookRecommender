@@ -17,7 +17,7 @@ public class MyLibraryForm extends JFrame {
     private JTable booksTable;
     private Map<String, Library> librariesMap;
 
-    public MyLibraryForm(List<Book> allBooks, User utente) {
+    public MyLibraryForm(List<Book> allBooks, String utente) {
         setTitle("My Library");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(800, 400);
