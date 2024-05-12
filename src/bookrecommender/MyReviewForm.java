@@ -113,31 +113,55 @@ public class MyReviewForm extends JFrame {
     }
 
     private boolean overwriteExistingReview(List<String> existingReviews, int style, int content, int enjoyability, int originality, int edition, String finalVote) {
-        String newReview = book.getTitle() + "," + book.getAuthors() + "," + book.getPublishYear() + ",";
-        newReview += style + "," + content + "," + enjoyability + "," + originality + "," + edition + "," + finalVote + ",";
-        newReview += username;
-        for (int i = 0; i < existingReviews.size(); i++) {
-            String[] parts = existingReviews.get(i).split(",");
-            if (parts.length >= 9 && parts[0].equals(book.getTitle()) && parts[7].equals(username)) {
-                existingReviews.set(i, newReview); // Sovrascrivi la recensione esistente
-                return true; // Recensione sovrascritta
+        String newReview = "\"" + book.getTitle() + "\",\"" + book.getAuthors() + "\"," + book.getPublishYear() + ",";
+        newReview += style + "," + content + "," + enjoyability + "," + originality + "," + edition + ",\"" + finalVote + "\",";
+        newReview += "\"" + username + "\"";
+    
+        String bookTitle = book.getTitle();
+        String reviewerUsername = username;
+    
+        // Creiamo una lista temporanea per tenere traccia delle recensioni esistenti per questo libro e utente
+        List<String> existingReviewsForUser = new ArrayList<>();
+    
+        for (String review : existingReviews) {
+            String[] parts = review.split(",");
+            if (parts.length >= 10) {
+                String existingBookTitle = parts[0].replace("\"", ""); // Rimuovi eventuali virgolette
+                String existingReviewerUsername = parts[9].replace("\"", ""); // Rimuovi eventuali virgolette
+                if (existingBookTitle.equals(bookTitle) && existingReviewerUsername.equals(reviewerUsername)) {
+                    // Se troviamo una recensione per lo stesso libro e utente, non sovrascriviamo subito,
+                    // ma aggiungiamo alla lista temporanea
+                    existingReviewsForUser.add(review);
+                }
             }
         }
+    
+        // Se abbiamo trovato almeno una recensione per lo stesso libro e utente, sovrascriviamo solo l'ultima
+        if (!existingReviewsForUser.isEmpty()) {
+            existingReviews.remove(existingReviewsForUser.get(existingReviewsForUser.size() - 1));
+            existingReviews.add(newReview);
+            return true;
+        }
+    
         return false; // Nessuna recensione sovrascritta
     }
+    
+    
 
     private void writeReviews(List<String> reviews) throws IOException {
         try (FileWriter writer = new FileWriter("./data/ValutazioneLibri.csv")) {
             for (String review : reviews) {
                 writer.write(review + "\n");
             }
+            writer.flush(); // Assicura che i dati siano scritti sul file
         }
     }
+    
 
     private void addNewReview(int style, int content, int enjoyability, int originality, int edition, String finalVote) throws IOException {
         try (FileWriter writer = new FileWriter("./data/ValutazioneLibri.csv", true)) {
-            writer.write(book.getTitle() + "," + book.getAuthors() + "," + book.getPublishYear() + ",");
-            writer.write(style + "," + content + "," + enjoyability + "," + originality + "," + edition + "," + finalVote + ",");
+            writer.write("\"" + book.getTitle() + "\",\"" + book.getAuthors() + "\"," + book.getPublishYear() + ",");
+            writer.write(style + "," + content + "," + enjoyability + "," + originality + "," + edition + ",\"" + finalVote + "\",");
             writer.write(username + "\n");
         }
     }
