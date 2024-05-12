@@ -40,7 +40,11 @@ public class SearchBookForm extends JFrame {
         searchButton.addActionListener(this::performSearch);
         searchPanel.add(searchButton);
 
+<<<<<<< HEAD
         model = new DefaultTableModel(new String[] { "Titolo", "Autori", "Anno di pubblicazione" }, 0);
+=======
+        model = new DefaultTableModel(new String[]{"Titolo", "Autori", "Anno di pubblicazione"}, 0);
+>>>>>>> fix
         table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
         panel.add(searchPanel, BorderLayout.NORTH);
@@ -49,8 +53,12 @@ public class SearchBookForm extends JFrame {
         add(panel);
         setVisible(true);
 
+<<<<<<< HEAD
         // Aggiungi un listener per fare clic su un libro nella tabella dei risultati di
         // ricerca
+=======
+        // Aggiungi un listener per fare clic su un libro nella tabella dei risultati di ricerca
+>>>>>>> fix
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -80,7 +88,11 @@ public class SearchBookForm extends JFrame {
     private void updateTable(List<Book> books) {
         model.setRowCount(0);
         for (Book book : books) {
+<<<<<<< HEAD
             model.addRow(new Object[] { book.getTitle(), book.getAuthors(), book.getPublishYear() });
+=======
+            model.addRow(new Object[]{book.getTitle(), book.getAuthors(), book.getPublishYear()});
+>>>>>>> fix
         }
     }
 
@@ -94,4 +106,8 @@ public class SearchBookForm extends JFrame {
             new BookForm(book);
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> fix

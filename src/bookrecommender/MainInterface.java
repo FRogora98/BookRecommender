@@ -16,6 +16,7 @@ public class MainInterface {
     private static JButton btnLibrary = new JButton("MyLibrary");
     private static JButton btnSearchBooks = new JButton("Cerca Libri");
     private static JButton btnRegister = new JButton("Registrati");
+    private static JTextField searchField = new JTextField(20);
     private static List<Book> allBooks = new ArrayList<>(); // Lista di tutti i libri caricati una sola volta
 
     public static void main(String[] args) {
@@ -25,24 +26,23 @@ public class MainInterface {
         frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
 
-        // Impostazione dello sfondo
-        ImageIcon backgroundImage = new ImageIcon("path/to/your/image.jpg");
-        JLabel background = new JLabel(backgroundImage);
-        frame.setContentPane(background);
-        background.setLayout(new BorderLayout());
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(btnLogin);
+        topPanel.add(btnLogout);
+        topPanel.add(btnRegister);
+        topPanel.add(btnLibrary);
+        btnLogout.setVisible(false); // Initially the logout button is not visible
 
-        JPanel topPanel = new JPanel(new GridBagLayout());
-        topPanel.setOpaque(false);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        topPanel.add(btnLogin, gbc);
-        topPanel.add(btnRegister, gbc);
-        topPanel.add(btnSearchBooks, gbc);
-
-        JPanel centerPanel = new JPanel();
-        centerPanel.setOpaque(false);
+        JPanel centerPanel = new JPanel(new FlowLayout());
+        centerPanel.setBackground(Color.WHITE);
+        JButton searchByTitleButton = new JButton("Cerca per Titolo");
+        JButton searchByAuthorButton = new JButton("Cerca per Autore");
+        JButton searchByYearButton = new JButton("Cerca per Anno di Uscita");
+        centerPanel.add(searchField);
+        centerPanel.add(searchByTitleButton);
+        centerPanel.add(searchByAuthorButton);
+        centerPanel.add(searchByYearButton);
 
         JPanel bottomPanel = new JPanel(new GridLayout(1, 5));
         bottomPanel.setOpaque(false);
@@ -52,17 +52,30 @@ public class MainInterface {
         bottomPanel.add(btnExit);
 
         btnLibrary.setVisible(false);
-        btnLogout.setVisible(false); // Initially the logout button is not visible
 
-        background.add(topPanel, BorderLayout.NORTH);
-        background.add(centerPanel, BorderLayout.CENTER);
-        background.add(bottomPanel, BorderLayout.SOUTH);
+        frame.setLayout(new BorderLayout());
+        frame.getContentPane().setBackground(Color.WHITE);
+        frame.add(topPanel, BorderLayout.NORTH);
+        frame.add(centerPanel, BorderLayout.CENTER);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
+        frame.add(lblUsername, BorderLayout.WEST);
+
+        btnLogin.setBackground(Color.WHITE);
+        btnLogout.setBackground(Color.WHITE);
+        btnRegister.setBackground(Color.WHITE);
+        btnLibrary.setBackground(Color.WHITE);
+        searchByTitleButton.setBackground(Color.LIGHT_GRAY);
+        searchByAuthorButton.setBackground(Color.LIGHT_GRAY);
+        searchByYearButton.setBackground(Color.LIGHT_GRAY);
+        btnExit.setBackground(Color.WHITE);
 
         frame.setVisible(true);
 
         btnLogin.addActionListener(e -> {
             LoginForm loginForm = new LoginForm();
             loginForm.setLoginListener(username -> {
+                lblUsername.setText("Benvenuto, " + username);
+                lblUsername.setVisible(true);
                 isLoggedIn = true;
                 updateInterfaceForLoggedInUser();
             });
@@ -71,6 +84,7 @@ public class MainInterface {
 
         btnLogout.addActionListener(e -> {
             isLoggedIn = false;
+            lblUsername.setVisible(false);
             updateInterfaceForLoggedInUser();
         });
 
@@ -83,21 +97,40 @@ public class MainInterface {
             exitApplication();
         });
 
+        // Aggiungi un listener per l'evento di pressione del tasto "Cerca per Titolo"
+        searchByTitleButton.addActionListener(e -> {
+            String searchTerm = searchField.getText();
+            List<Book> searchResults = searchBooksByTitle(searchTerm);
+            displaySearchResults(searchResults);
+        });
+
+        // Aggiungi un listener per l'evento di pressione del tasto "Cerca per Autore"
+        searchByAuthorButton.addActionListener(e -> {
+            String searchTerm = searchField.getText();
+            List<Book> searchResults = searchBooksByAuthor(searchTerm);
+            displaySearchResults(searchResults);
+        });
+
+        // Aggiungi un listener per l'evento di pressione del tasto "Cerca per Anno di Uscita"
+        searchByYearButton.addActionListener(e -> {
+            String searchTerm = searchField.getText();
+            List<Book> searchResults = searchBooksByYear(searchTerm);
+            displaySearchResults(searchResults);
+        });
+
+        // Aggiungi un listener per il bottone MyLibrary
         btnLibrary.addActionListener(e -> {
-            MyLibraryForm myLibraryForm = new MyLibraryForm();
+            MyLibraryForm myLibraryForm = new MyLibraryForm(allBooks, user);
             myLibraryForm.setVisible(true);
         });
 
-        btnSearchBooks.addActionListener(e -> {
-            SearchBookForm searchBookForm = new SearchBookForm(allBooks);
-            searchBookForm.setVisible(true);
-        });
+        frame.setVisible(true);
     }
 
     private static void loadBooks() {
         try (BufferedReader br = new BufferedReader(new FileReader("./data/Libri.csv"))) {
             String line;
-            br.readLine(); // Skip header line
+            br.readLine(); // Salta la riga dell'intestazione
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
                 if (parts.length >= 3) {
@@ -123,7 +156,79 @@ public class MainInterface {
     }
 
     private static void exitApplication() {
-        frame.dispose();
-        System.exit(0);
+        frame.dispose(); // Chiude il frame
+        System.exit(0); // Termina l'applicazione
+    }
+
+    private static List<Book> searchBooksByTitle(String searchTerm) {
+        List<Book> results = new ArrayList<>();
+        for (Book book : allBooks) {
+            if (book.getTitle().toLowerCase().contains(searchTerm.toLowerCase())) {
+                results.add(book);
+            }
+        }
+        return results;
+    }
+
+    private static List<Book> searchBooksByAuthor(String searchTerm) {
+        List<Book> results = new ArrayList<>();
+        for (Book book : allBooks) {
+            if (book.getAuthors().toLowerCase().contains(searchTerm.toLowerCase())) {
+                results.add(book);
+            }
+        }
+        return results;
+    }
+
+    private static List<Book> searchBooksByYear(String searchTerm) {
+        List<Book> results = new ArrayList<>();
+        for (Book book : allBooks) {
+            if (book.getPublishYear().toLowerCase().contains(searchTerm.toLowerCase())) {
+                results.add(book);
+            }
+        }
+        return results;
+    }
+
+    private static void displaySearchResults(List<Book> searchResults) {
+        JFrame searchResultsFrame = new JFrame("Risultati della ricerca");
+        searchResultsFrame.setSize(800, 600); // Imposta le dimensioni desiderate
+        searchResultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    
+        String[] columnNames = {"Titolo", "Autori", "Data di pubblicazione"};
+        DefaultTableModel model = new DefaultTableModel(null, columnNames); // Crea un nuovo modello vuoto
+    
+        for (Book book : searchResults) {
+            Object[] rowData = new Object[7];
+            rowData[0] = book.getTitle();
+            rowData[1] = book.getAuthors();
+            rowData[2] = book.getPublishYear();
+            model.addRow(rowData); // Aggiungi riga al modello
+        }
+    
+        JTable table = new JTable(model);
+        table.setFillsViewportHeight(true); // Riempie l'altezza della finestra con la tabella
+        JScrollPane scrollPane = new JScrollPane(table);
+    
+        // Aggiungi un listener di mouse per la tabella dei risultati della ricerca
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    Book selectedBook = searchResults.get(row);
+                    openBookForm(selectedBook);
+                }
+            }
+        });
+
+        // Aggiungi il pannello dei risultati alla finestra dei risultati
+        searchResultsFrame.getContentPane().add(scrollPane);
+        searchResultsFrame.setLocationRelativeTo(null);
+        searchResultsFrame.setVisible(true);
+    }
+
+    private static void openBookForm(Book book) {
+        BookForm bookForm = new BookForm(book);
     }
 }

@@ -7,13 +7,15 @@ import java.io.*;
 import java.util.List;
 
 public class MyLibraryForm extends JFrame {
-    private JList<String> libraryList;
-    private JList<String> bookDetailsList;
-    private DefaultListModel<String> libraryModel;
-    private DefaultListModel<String> bookDetailsModel;
+    private JList<Library> libraryList;
+    private JList<Book> bookDetailsList;
+    private DefaultListModel<Library> libraryModel;
+    private DefaultListModel<Book> bookDetailsModel;
     private JButton createLibraryButton;
+    private String Username;
 
-    public MyLibraryForm() {
+    public MyLibraryForm(List<Book> allBooks, String username) {
+        this.Username = username;
         setTitle("My Library");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -25,9 +27,11 @@ public class MyLibraryForm extends JFrame {
         libraryList = new JList<>(libraryModel);
         libraryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         libraryList.addListSelectionListener(this::librarySelected);
+        libraryList.setCellRenderer(new LibraryListCellRenderer());
 
         bookDetailsModel = new DefaultListModel<>();
         bookDetailsList = new JList<>(bookDetailsModel);
+        bookDetailsList.setCellRenderer(new BookListCellRenderer());
 
         createLibraryButton = new JButton("Crea Libreria");
         createLibraryButton.addActionListener(e -> openLibraryCreationDialog());
@@ -45,23 +49,27 @@ public class MyLibraryForm extends JFrame {
     }
 
     private void librarySelected(ListSelectionEvent e) {
-        if (!e.getValueIsAdjusting()) {
-            String selectedLibrary = libraryList.getSelectedValue();
-            loadLibraryDetails(selectedLibrary);
+        if (!e.getValueIsAdjusting() && libraryList.getSelectedValue() != null) {
+            Library selectedLibrary = libraryList.getSelectedValue();
+            bookDetailsModel.clear();
+            selectedLibrary.getBooks().forEach(bookDetailsModel::addElement);
         }
     }
 
     private void loadLibraries() {
-        // Load library names from Librerie.csv
         libraryModel.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader("./data/Librerie.csv"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                String libraryName = parts[0];
-                if (!libraryModel.contains(libraryName)) {
-                    libraryModel.addElement(libraryName);
+                Library library = new Library(parts[0], Username);
+                for (int i = 1; i < parts.length; i++) {
+                    String[] bookInfo = parts[i].split(" - ");
+                    if (bookInfo.length == 3) {
+                        library.addBook(new Book(bookInfo[0], bookInfo[1], bookInfo[2]));
+                    }
                 }
+                libraryModel.addElement(library);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -70,37 +78,27 @@ public class MyLibraryForm extends JFrame {
         }
     }
 
-    private void loadLibraryDetails(String libraryName) {
-        // Load books for the selected library from Librerie.csv
-        bookDetailsModel.clear();
-        try (BufferedReader reader = new BufferedReader(new FileReader("./data/Librerie.csv"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith(libraryName + ",")) {
-                    String[] parts = line.split(",");
-                    bookDetailsModel.addElement(parts[1]);
-                }
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore durante il caricamento dei dettagli della libreria.", "Errore",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
+    /*------------------------------------------------------------------------------------- */
+    /*------------------------------------------------------------------------------------- */
+    /*------------------------------------------------------------------------------------- */
+    // OPENCREATIONDIALOG
     private void openLibraryCreationDialog() {
         JDialog creationDialog = new JDialog(this, "Crea nuova libreria", true);
-        DefaultListModel<String> allBooksModel = new DefaultListModel<>();
-        JList<String> allBooksList = new JList<>(allBooksModel);
+        creationDialog.setLayout(new BorderLayout());
+
+        // Model and list for displaying available books
+        DefaultListModel<Book> allBooksModel = new DefaultListModel<>();
+        JList<Book> allBooksList = new JList<>(allBooksModel);
+        allBooksList.setCellRenderer(new BookListCellRenderer());
+
+        loadAllBooks(allBooksModel);
+
+        // Filters
+        JPanel filterPanel = new JPanel();
         JTextField filterTitle = new JTextField(10);
         JTextField filterAuthor = new JTextField(10);
         JTextField filterYear = new JTextField(10);
         JButton filterButton = new JButton("Filtra");
-        JButton saveButton = new JButton("Salva Libreria");
-
-        loadAllBooks(allBooksModel);
-
-        JPanel filterPanel = new JPanel();
         filterPanel.add(new JLabel("Titolo:"));
         filterPanel.add(filterTitle);
         filterPanel.add(new JLabel("Autore:"));
@@ -109,30 +107,34 @@ public class MyLibraryForm extends JFrame {
         filterPanel.add(filterYear);
         filterPanel.add(filterButton);
 
-        creationDialog.setLayout(new BorderLayout());
-        creationDialog.add(filterPanel, BorderLayout.NORTH);
-        creationDialog.add(new JScrollPane(allBooksList), BorderLayout.CENTER);
-        creationDialog.add(saveButton, BorderLayout.SOUTH);
-
+        // Actions for filter button
         filterButton.addActionListener(
                 e -> applyFilters(allBooksModel, filterTitle.getText(), filterAuthor.getText(), filterYear.getText()));
 
+        // Button to save the new library
+        JButton saveButton = new JButton("Salva Libreria");
         saveButton.addActionListener(e -> {
-            List<String> selectedBooks = allBooksList.getSelectedValuesList();
+            List<Book> selectedBooks = allBooksList.getSelectedValuesList();
             String libraryName = JOptionPane.showInputDialog(creationDialog, "Inserisci il nome della nuova libreria:");
             if (libraryName != null && !libraryName.isEmpty()) {
-                saveLibrary(libraryName, selectedBooks);
-                libraryModel.addElement(libraryName);
+                Library newLibrary = new Library(libraryName, Username);
+                selectedBooks.forEach(newLibrary::addBook);
+                libraryModel.addElement(newLibrary);
+                saveLibrary(newLibrary);
                 creationDialog.dispose();
             }
         });
+
+        creationDialog.add(filterPanel, BorderLayout.NORTH);
+        creationDialog.add(new JScrollPane(allBooksList), BorderLayout.CENTER);
+        creationDialog.add(saveButton, BorderLayout.SOUTH);
 
         creationDialog.pack();
         creationDialog.setLocationRelativeTo(this);
         creationDialog.setVisible(true);
     }
 
-    private void applyFilters(DefaultListModel<String> model, String title, String author, String year) {
+    private void applyFilters(DefaultListModel<Book> model, String title, String author, String year) {
         model.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader("./data/Libri.csv"))) {
             String line;
@@ -140,13 +142,11 @@ public class MyLibraryForm extends JFrame {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
                 if (data.length >= 3) {
-                    String bookTitle = data[0];
-                    String bookAuthor = data[1];
-                    String bookYear = data[2];
-                    if (bookTitle.toLowerCase().contains(title.toLowerCase()) &&
-                            bookAuthor.toLowerCase().contains(author.toLowerCase()) &&
-                            bookYear.toLowerCase().contains(year.toLowerCase())) {
-                        model.addElement(bookTitle + " - " + bookAuthor + " - " + bookYear);
+                    Book book = new Book(data[0], data[1], data[2]);
+                    if (book.getTitle().toLowerCase().contains(title.toLowerCase()) &&
+                            book.getAuthors().toLowerCase().contains(author.toLowerCase()) &&
+                            book.getPublishYear().toLowerCase().contains(year.toLowerCase())) {
+                        model.addElement(book);
                     }
                 }
             }
@@ -155,31 +155,57 @@ public class MyLibraryForm extends JFrame {
         }
     }
 
-    private void loadAllBooks(DefaultListModel<String> model) {
-        // Load all books from Libri.csv
+    private void loadAllBooks(DefaultListModel<Book> model) {
         try (BufferedReader reader = new BufferedReader(new FileReader("./data/Libri.csv"))) {
             String line;
             reader.readLine(); // Skip header
             while ((line = reader.readLine()) != null) {
-                model.addElement(line);
+                String[] data = line.split(",");
+                if (data.length >= 3) {
+                    model.addElement(new Book(data[0], data[1], data[2]));
+                }
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore durante il caricamento dei libri.", "Errore",
-                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void saveLibrary(String libraryName, List<String> selectedBooks) {
-        // Save the new library to Librerie.csv
+    private void saveLibrary(Library library) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("./data/Librerie.csv", true))) {
-            for (String book : selectedBooks) {
-                writer.write(libraryName + "," + book + "\n");
+            for (Book book : library.getBooks()) {
+                writer.write(library.getLibraryName() + "," + book.getTitle() + " - " + book.getAuthors() + " - "
+                        + book.getPublishYear() + "\n");
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore durante il salvataggio della libreria.", "Errore",
-                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    // FINE OPERCREATIONDIAOLOG
+    /*------------------------------------------------------------------------------------- */
+    /*------------------------------------------------------------------------------------- */
+
+    class LibraryListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (value instanceof Library) {
+                setText(((Library) value).getLibraryName());
+            }
+            return this;
+        }
+    }
+
+    class BookListCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (value instanceof Book) {
+                Book book = (Book) value;
+                setText(book.getTitle() + " - " + book.getAuthors() + " - " + book.getPublishYear());
+            }
+            return this;
         }
     }
 }
