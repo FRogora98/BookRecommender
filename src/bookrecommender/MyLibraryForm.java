@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MyLibraryForm extends JFrame {
@@ -13,8 +12,10 @@ public class MyLibraryForm extends JFrame {
     private DefaultListModel<Library> libraryModel;
     private DefaultListModel<Book> bookDetailsModel;
     private JButton createLibraryButton;
+    private String Username;
 
-    public MyLibraryForm() {
+    public MyLibraryForm(List<Book> allBooks, String username) {
+        this.Username = username;
         setTitle("My Library");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -61,7 +62,7 @@ public class MyLibraryForm extends JFrame {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                Library library = new Library(parts[0]);
+                Library library = new Library(parts[0], Username);
                 for (int i = 1; i < parts.length; i++) {
                     String[] bookInfo = parts[i].split(" - ");
                     if (bookInfo.length == 3) {
@@ -117,7 +118,7 @@ public class MyLibraryForm extends JFrame {
             List<Book> selectedBooks = allBooksList.getSelectedValuesList();
             String libraryName = JOptionPane.showInputDialog(creationDialog, "Inserisci il nome della nuova libreria:");
             if (libraryName != null && !libraryName.isEmpty()) {
-                Library newLibrary = new Library(libraryName);
+                Library newLibrary = new Library(libraryName, Username);
                 selectedBooks.forEach(newLibrary::addBook);
                 libraryModel.addElement(newLibrary);
                 saveLibrary(newLibrary);

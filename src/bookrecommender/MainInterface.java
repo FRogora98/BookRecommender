@@ -16,7 +16,13 @@ public class MainInterface {
     private static JButton btnLibrary = new JButton("MyLibrary");
     private static JButton btnSearchBooks = new JButton("Cerca Libri");
     private static JButton btnRegister = new JButton("Registrati");
+<<<<<<< HEAD
     private static List<Book> allBooks = new ArrayList<>(); // Lista di tutti i libri caricati una sola volta
+=======
+    private static JButton btnSearchBooks = new JButton("Cerca Libri");
+    private static List<Book> allBooks = new ArrayList<>();
+    private static String user;
+>>>>>>> fix
 
     public static void main(String[] args) {
         loadBooks();
@@ -25,6 +31,7 @@ public class MainInterface {
         frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
 
+<<<<<<< HEAD
         // Impostazione dello sfondo
         ImageIcon backgroundImage = new ImageIcon("path/to/your/image.jpg");
         JLabel background = new JLabel(backgroundImage);
@@ -43,6 +50,19 @@ public class MainInterface {
 
         JPanel centerPanel = new JPanel();
         centerPanel.setOpaque(false);
+=======
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(btnLogin);
+        topPanel.add(btnLogout);
+        topPanel.add(btnRegister);
+        topPanel.add(btnLibrary);
+        topPanel.add(btnSearchBooks);
+        btnLogout.setVisible(false);
+
+        JPanel centerPanel = new JPanel(new FlowLayout());
+        centerPanel.setBackground(Color.WHITE);
+>>>>>>> fix
 
         JPanel bottomPanel = new JPanel(new GridLayout(1, 5));
         bottomPanel.setOpaque(false);
@@ -54,15 +74,37 @@ public class MainInterface {
         btnLibrary.setVisible(false);
         btnLogout.setVisible(false); // Initially the logout button is not visible
 
+<<<<<<< HEAD
         background.add(topPanel, BorderLayout.NORTH);
         background.add(centerPanel, BorderLayout.CENTER);
         background.add(bottomPanel, BorderLayout.SOUTH);
+=======
+        frame.setLayout(new BorderLayout());
+        frame.getContentPane().setBackground(Color.WHITE);
+        frame.add(topPanel, BorderLayout.NORTH);
+        frame.add(centerPanel, BorderLayout.CENTER);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
+        frame.add(lblUsername, BorderLayout.WEST);
+
+        btnLogin.setBackground(Color.WHITE);
+        btnLogout.setBackground(Color.WHITE);
+        btnRegister.setBackground(Color.WHITE);
+        btnLibrary.setBackground(Color.WHITE);
+        btnSearchBooks.setBackground(Color.WHITE);
+        btnExit.setBackground(Color.WHITE);
+>>>>>>> fix
 
         frame.setVisible(true);
 
         btnLogin.addActionListener(e -> {
             LoginForm loginForm = new LoginForm();
             loginForm.setLoginListener(username -> {
+<<<<<<< HEAD
+=======
+                lblUsername.setText("Benvenuto, " + username);
+                user = username;
+                lblUsername.setVisible(true);
+>>>>>>> fix
                 isLoggedIn = true;
                 updateInterfaceForLoggedInUser();
             });
@@ -71,6 +113,11 @@ public class MainInterface {
 
         btnLogout.addActionListener(e -> {
             isLoggedIn = false;
+<<<<<<< HEAD
+=======
+            user = "";
+            lblUsername.setVisible(false);
+>>>>>>> fix
             updateInterfaceForLoggedInUser();
         });
 
@@ -83,21 +130,36 @@ public class MainInterface {
             exitApplication();
         });
 
+<<<<<<< HEAD
+=======
+        btnSearchBooks.addActionListener(e -> {
+            SearchBookForm searchBookForm = new SearchBookForm(allBooks);
+            searchBookForm.setVisible(true);
+        });
+
+>>>>>>> fix
         btnLibrary.addActionListener(e -> {
-            MyLibraryForm myLibraryForm = new MyLibraryForm();
+            MyLibraryForm myLibraryForm = new MyLibraryForm(allBooks, user);
             myLibraryForm.setVisible(true);
         });
+<<<<<<< HEAD
 
         btnSearchBooks.addActionListener(e -> {
             SearchBookForm searchBookForm = new SearchBookForm(allBooks);
             searchBookForm.setVisible(true);
         });
+=======
+>>>>>>> fix
     }
 
     private static void loadBooks() {
         try (BufferedReader br = new BufferedReader(new FileReader("./data/Libri.csv"))) {
             String line;
+<<<<<<< HEAD
             br.readLine(); // Skip header line
+=======
+            br.readLine();
+>>>>>>> fix
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
                 if (parts.length >= 3) {
@@ -126,4 +188,9 @@ public class MainInterface {
         frame.dispose();
         System.exit(0);
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> fix
