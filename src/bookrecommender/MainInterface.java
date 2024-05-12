@@ -15,10 +15,13 @@ public class MainInterface {
     private static JButton btnLogin = new JButton("Login");
     private static JButton btnLogout = new JButton("Logout");
     private static JButton btnLibrary = new JButton("MyLibrary");
+    private static JButton btnReview = new JButton("MyReview");
+    private static JButton btnRecommend = new JButton("MyRecommend");
     private static JButton btnRegister = new JButton("Registrati");
     private static JButton btnSearchBooks = new JButton("Cerca Libri");
+    private static JButton btnExit = new JButton("Esci"); // Pulsante "Esci"
     private static List<Book> allBooks = new ArrayList<>();
-    private static String user;
+    private static String Username;
 
     public static void main(String[] args) {
         loadBooks();
@@ -32,20 +35,40 @@ public class MainInterface {
         topPanel.add(btnLogin);
         topPanel.add(btnLogout);
         topPanel.add(btnRegister);
-        topPanel.add(btnLibrary);
         topPanel.add(btnSearchBooks);
         btnLogout.setVisible(false);
 
         JPanel centerPanel = new JPanel(new FlowLayout());
         centerPanel.setBackground(Color.WHITE);
 
-        JPanel bottomPanel = new JPanel(new GridLayout(1, 5));
+        JPanel bottomPanel = new JPanel(new BorderLayout()); // Modifica qui
         bottomPanel.setBackground(Color.WHITE);
-        bottomPanel.add(btnLibrary);
-        JButton btnExit = new JButton("Esci");
-        bottomPanel.add(btnExit);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Aggiunto margine
 
+        JPanel leftPanel = new JPanel(new GridLayout(5, 1, 5, 5)); // Pannello per i bottoni sul lato sinistro
+        leftPanel.setBackground(Color.WHITE);
+
+        btnLibrary.setBackground(Color.WHITE);
         btnLibrary.setVisible(false);
+        leftPanel.add(btnLibrary);
+
+        btnReview.setBackground(Color.WHITE);
+        btnReview.setVisible(false);
+        leftPanel.add(btnReview);
+
+        btnRecommend.setBackground(Color.WHITE);
+        btnRecommend.setVisible(false);
+        leftPanel.add(btnRecommend);
+
+        btnSearchBooks.setBackground(Color.WHITE);
+        leftPanel.add(btnSearchBooks);
+
+        bottomPanel.add(leftPanel, BorderLayout.WEST);
+
+        JPanel exitPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); // Pannello per il pulsante "Esci"
+        exitPanel.setBackground(Color.WHITE);
+        exitPanel.add(btnExit);
+        bottomPanel.add(exitPanel, BorderLayout.SOUTH); // Aggiunto il pannello al lato destro
 
         frame.setLayout(new BorderLayout());
         frame.getContentPane().setBackground(Color.WHITE);
@@ -57,9 +80,8 @@ public class MainInterface {
         btnLogin.setBackground(Color.WHITE);
         btnLogout.setBackground(Color.WHITE);
         btnRegister.setBackground(Color.WHITE);
-        btnLibrary.setBackground(Color.WHITE);
         btnSearchBooks.setBackground(Color.WHITE);
-        btnExit.setBackground(Color.WHITE);
+        btnExit.setBackground(Color.WHITE); // Impostare lo sfondo del pulsante "Esci"
 
         frame.setVisible(true);
 
@@ -67,7 +89,7 @@ public class MainInterface {
             LoginForm loginForm = new LoginForm();
             loginForm.setLoginListener(username -> {
                 lblUsername.setText("Benvenuto, " + username);
-                user = username;
+                Username = username;
                 lblUsername.setVisible(true);
                 isLoggedIn = true;
                 updateInterfaceForLoggedInUser();
@@ -77,7 +99,7 @@ public class MainInterface {
 
         btnLogout.addActionListener(e -> {
             isLoggedIn = false;
-            user = "";
+            Username = "";
             lblUsername.setVisible(false);
             updateInterfaceForLoggedInUser();
         });
@@ -87,18 +109,28 @@ public class MainInterface {
             registerForm.setVisible(true);
         });
 
-        btnExit.addActionListener(e -> {
-            exitApplication();
-        });
-
         btnSearchBooks.addActionListener(e -> {
-            SearchBookForm searchBookForm = new SearchBookForm(allBooks);
+            SearchBookForm searchBookForm = new SearchBookForm(allBooks, false, false, "");
             searchBookForm.setVisible(true);
         });
 
         btnLibrary.addActionListener(e -> {
-            MyLibraryForm myLibraryForm = new MyLibraryForm(allBooks, user);
+            MyLibraryForm myLibraryForm = new MyLibraryForm(allBooks, Username);
             myLibraryForm.setVisible(true);
+        });
+
+        btnReview.addActionListener(e -> {
+            SearchBookForm reviewBookForm = new SearchBookForm(allBooks, true, false, Username);
+            reviewBookForm.setVisible(true);
+        });
+
+        btnRecommend.addActionListener(e -> {
+            SearchBookForm recommendBookForm = new SearchBookForm(allBooks, false, true, Username);
+            recommendBookForm.setVisible(true);
+        });
+
+        btnExit.addActionListener(e -> {
+            exitApplication();
         });
     }
 
@@ -128,6 +160,8 @@ public class MainInterface {
         btnLogout.setVisible(isLoggedIn);
         btnRegister.setVisible(!isLoggedIn);
         btnLibrary.setVisible(isLoggedIn);
+        btnReview.setVisible(isLoggedIn); 
+        btnRecommend.setVisible(isLoggedIn); 
     }
 
     private static void exitApplication() {
@@ -135,4 +169,3 @@ public class MainInterface {
         System.exit(0);
     }
 }
-

@@ -16,9 +16,16 @@ public class SearchBookForm extends JFrame {
     private DefaultTableModel model;
     private JTable table;
     private List<Book> allBooks;
+    private boolean review;
+    private boolean recommender;
+    private String username;
 
-    public SearchBookForm(List<Book> books) {
+    public SearchBookForm(List<Book> books, boolean review, boolean recommender, String username) {
         this.allBooks = books;
+        this.review = review;
+        this.recommender = recommender;
+        this.username = username; // Aggiunto username come parametro
+
         setTitle("Cerca Libri");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -90,7 +97,13 @@ public class SearchBookForm extends JFrame {
             String publishYear = (String) model.getValueAt(rowIndex, 2);
 
             Book book = new Book(title, authors, publishYear);
-            new BookForm(book);
+            if (review) {
+                new MyReviewForm(book, username); // Utilizzo del parametro username
+            } else if (recommender) {
+                // Aggiungi qui il codice per aprire il form per consigliare libri
+            } else {
+                new BookForm(book);
+            }
         }
     }
 }
